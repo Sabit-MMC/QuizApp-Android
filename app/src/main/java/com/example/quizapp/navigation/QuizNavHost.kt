@@ -31,7 +31,7 @@ fun QuizNavHost(navHostController: NavHostController, viewModel: QuestionViewMod
             QuestionScreen(navHostController,viewModel, level)
         }
         composable(route = QuizNavHostObject.QuizResultScreen){
-            QuizResultScreen()
+            QuizResultScreen(navHostController,viewModel)
         }
     }
 }

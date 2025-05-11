@@ -1,4 +1,4 @@
-package com.example.quizapp
+package com.example.quizapp.presentation.quiz.screens
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,7 +17,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.quizapp.navigation.QuizNavHostObject
+import com.example.quizapp.presentation.quiz.QuizNavHostObject
+import com.example.quizapp.presentation.quiz.QuestionViewModel
 
 @Composable
 fun StartGameScreen(

@@ -1,4 +1,4 @@
-package com.example.quizapp
+package com.example.quizapp.presentation.quiz.screens
 
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -39,8 +39,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.quizapp.model.QuizSubmissionRequest
-import com.example.quizapp.navigation.QuizNavHostObject
+import com.example.quizapp.tools.Status
+import com.example.quizapp.data.model.QuizSubmissionRequest
+import com.example.quizapp.presentation.quiz.QuizNavHostObject
+import com.example.quizapp.presentation.quiz.QuestionViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -230,7 +232,6 @@ fun BackConfirmHandler(
 ) {
     var showDialog by remember { mutableStateOf(false) }
 
-    // Geri düyməsi və gesture üçün
     BackHandler(enabled = true) {
         showDialog = true
     }

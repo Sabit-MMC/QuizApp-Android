@@ -1,7 +1,9 @@
 package com.example.quizapp.di
 
-import com.example.quizapp.ApiService
-import com.example.quizapp.QuizRepository
+import com.example.quizapp.data.repository.auth.AuthRepository
+import com.example.quizapp.data.services.quiz.ApiService
+import com.example.quizapp.data.repository.quiz.QuizRepository
+import com.example.quizapp.data.services.auth.AuthServices
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -41,9 +43,17 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideApiService(retrofit: Retrofit): ApiService = retrofit.create(ApiService::class.java)
+    fun provideQuizService(retrofit: Retrofit): ApiService = retrofit.create(ApiService::class.java)
 
     @Provides
     @Singleton
-    fun provideRepository(apiService: ApiService): QuizRepository = QuizRepository(apiService)
+    fun provideAuthService(retrofit: Retrofit): AuthServices = retrofit.create(AuthServices::class.java)
+
+    @Provides
+    @Singleton
+    fun provideQuizRepository(apiService: ApiService): QuizRepository = QuizRepository(apiService)
+
+    @Provides
+    @Singleton
+    fun provideAuthRepository(authServices: AuthServices): AuthRepository = AuthRepository(authServices)
 }

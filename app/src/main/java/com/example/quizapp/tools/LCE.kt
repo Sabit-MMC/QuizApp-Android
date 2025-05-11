@@ -1,4 +1,4 @@
-package com.example.quizapp
+package com.example.quizapp.tools
 
 data class LCE<T>(
     var status: Status? = null,

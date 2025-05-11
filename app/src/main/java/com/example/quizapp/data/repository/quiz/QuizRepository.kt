@@ -1,7 +1,8 @@
-package com.example.quizapp
+package com.example.quizapp.data.repository.quiz
 
-import com.example.quizapp.model.QuizResult
-import com.example.quizapp.model.QuizSubmissionRequest
+import com.example.quizapp.data.model.QuizResult
+import com.example.quizapp.data.model.QuizSubmissionRequest
+import com.example.quizapp.data.services.quiz.ApiService
 
 class QuizRepository(val apiService: ApiService) {
     suspend fun getQuestions() = apiService.getQuestion()

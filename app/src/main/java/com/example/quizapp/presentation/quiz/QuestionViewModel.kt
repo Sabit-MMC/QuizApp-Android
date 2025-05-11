@@ -1,14 +1,16 @@
-package com.example.quizapp
+package com.example.quizapp.presentation.quiz
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.quizapp.model.AllLevelsQuestions
-import com.example.quizapp.model.LevelQuestionGroup
-import com.example.quizapp.model.QuizResult
-import com.example.quizapp.model.QuizSubmissionRequest
+import com.example.quizapp.tools.LCE
+import com.example.quizapp.data.model.AllLevelsQuestions
+import com.example.quizapp.data.model.LevelQuestionGroup
+import com.example.quizapp.data.model.QuizResult
+import com.example.quizapp.data.model.QuizSubmissionRequest
+import com.example.quizapp.data.repository.quiz.QuizRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -58,66 +60,66 @@ class QuestionViewModel @Inject constructor(private val quizRepository: QuizRepo
 
 
     fun getQuestions() {
-        _questionState.value = LCE.loading()
+        _questionState.value = LCE.Companion.loading()
         viewModelScope.launch(Dispatchers.IO) {
             val response = quizRepository.getQuestions()
             if (response.isSuccessful) {
-                _questionState.value = LCE.content(response.body())
+                _questionState.value = LCE.Companion.content(response.body())
             } else {
                 _questionState.value =
-                    LCE.error(errorMessage = response.errorBody()?.string() ?: "")
+                    LCE.Companion.error(errorMessage = response.errorBody()?.string() ?: "")
             }
         }
     }
 
     fun getLeveledQuestion(level: Int) {
-        _leveledQuestionState.value = LCE.loading()
+        _leveledQuestionState.value = LCE.Companion.loading()
         viewModelScope.launch(Dispatchers.IO) {
             val response = quizRepository.getLeveledQuestion(level)
             if (response.isSuccessful) {
-                _leveledQuestionState.value = LCE.content(response.body())
+                _leveledQuestionState.value = LCE.Companion.content(response.body())
             } else {
                 _leveledQuestionState.value =
-                    LCE.error(errorMessage = response.errorBody()?.string() ?: "")
+                    LCE.Companion.error(errorMessage = response.errorBody()?.string() ?: "")
             }
         }
     }
 
     fun submitQuiz(quizSubmissionRequest: QuizSubmissionRequest) {
-        _submitQuizState.value = LCE.loading()
+        _submitQuizState.value = LCE.Companion.loading()
         viewModelScope.launch(Dispatchers.IO) {
             val response = quizRepository.submitQuiz(quizSubmissionRequest)
             if (response.isSuccessful) {
-                _submitQuizState.value = LCE.content(response.body())
+                _submitQuizState.value = LCE.Companion.content(response.body())
             } else {
                 _submitQuizState.value =
-                    LCE.error(errorMessage = response.errorBody()?.string() ?: "")
+                    LCE.Companion.error(errorMessage = response.errorBody()?.string() ?: "")
             }
         }
     }
 
     fun insertQuiz(quizResult: QuizResult) {
-        _insertQuizState.value = LCE.loading()
+        _insertQuizState.value = LCE.Companion.loading()
         viewModelScope.launch(Dispatchers.IO) {
             val response = quizRepository.insertQuiz(quizResult)
             if (response.isSuccessful) {
-                _insertQuizState.value = LCE.content(response.body())
+                _insertQuizState.value = LCE.Companion.content(response.body())
             } else {
                 _insertQuizState.value =
-                    LCE.error(errorMessage = response.errorBody()?.string() ?: "")
+                    LCE.Companion.error(errorMessage = response.errorBody()?.string() ?: "")
             }
         }
     }
 
     fun fetchAllResults() {
-        _getAllResultState.value = LCE.loading()
+        _getAllResultState.value = LCE.Companion.loading()
         viewModelScope.launch(Dispatchers.IO) {
             val response = quizRepository.fetchAllResults()
             if (response.isSuccessful) {
-                _getAllResultState.value = LCE.content(response.body())
+                _getAllResultState.value = LCE.Companion.content(response.body())
             } else {
                 _getAllResultState.value =
-                    LCE.error(errorMessage = response.errorBody()?.string() ?: "")
+                    LCE.Companion.error(errorMessage = response.errorBody()?.string() ?: "")
             }
         }
     }
@@ -129,6 +131,6 @@ class QuestionViewModel @Inject constructor(private val quizRepository: QuizRepo
         currentIndex = 0
     }
     fun clearSubmitState(){
-        _submitQuizState.value = LCE.content(null)
+        _submitQuizState.value = LCE.Companion.content(null)
     }
 }

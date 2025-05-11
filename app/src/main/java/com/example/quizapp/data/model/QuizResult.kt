@@ -1,4 +1,4 @@
-package com.example.quizapp.model
+package com.example.quizapp.data.model
 
 data class QuizResult(
     val level: Int,

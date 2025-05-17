@@ -72,4 +72,9 @@ dependencies {
     //navigation
     implementation(libs.navigation.ui)
     implementation(libs.navigation.compose)
+
+    //data-store
+    implementation(libs.datastore.preferences)
+
+    implementation(libs.kotlin.serialization)
 }

@@ -12,27 +12,39 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
+import com.example.quizapp.presentation.MainScreen
+import com.example.quizapp.presentation.auth.AuthViewModel
+import com.example.quizapp.tools.DataStoreHelper
 import com.example.quizapp.ui.theme.QuizAppTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlin.getValue
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class QuizActivity : ComponentActivity() {
-    private val viewModel: QuestionViewModel by viewModels()
+    private val questionViewModel: QuestionViewModel by viewModels()
+    private val authViewModel: AuthViewModel by viewModels()
+
+    @Inject
+    lateinit var dataStoreHelper: DataStoreHelper
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             val navHostController = rememberNavController()
-            LaunchedEffect(true) {
-                viewModel.getQuestions()
-            }
             QuizAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Column(
-                        modifier = Modifier.padding(innerPadding).fillMaxSize()
+                        modifier = Modifier
+                            .padding(innerPadding)
+                            .fillMaxSize()
                     ) {
-                        QuizNavHost(navHostController = navHostController,viewModel = viewModel)
+                        MainScreen(
+                            navHostController,
+                            authViewModel = authViewModel,
+                            questionViewModel = questionViewModel,
+                            dataStoreHelper = dataStoreHelper
+                        )
                     }
                 }
             }

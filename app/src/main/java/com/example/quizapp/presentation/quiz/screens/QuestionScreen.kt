@@ -1,7 +1,7 @@
 package com.example.quizapp.presentation.quiz.screens
 
+import android.annotation.SuppressLint
 import android.widget.Toast
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -25,26 +24,24 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.quizapp.tools.Status
-import com.example.quizapp.data.model.QuizSubmissionRequest
-import com.example.quizapp.presentation.quiz.QuizNavHostObject
 import com.example.quizapp.presentation.quiz.QuestionViewModel
+import com.example.quizapp.presentation.quiz.QuizNavHostObject
+import com.example.quizapp.tools.Status
+import com.example.quizapp.tools.components.BackConfirmHandler
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
+@SuppressLint("UnrememberedMutableState")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QuestionScreen(
     navHostController: NavHostController,
@@ -53,9 +50,12 @@ fun QuestionScreen(
 ) {
     val leveledQuestionStateValue by viewModel.leveledQuestionState.collectAsState()
     val submitQuizState by viewModel.submitQuizState.collectAsState()
+    val timeLeft by viewModel.timeLeft.collectAsState()
+    val isLastQuestion = derivedStateOf {
+        viewModel.currentIndex == leveledQuestionStateValue?.data?.questions?.size?.minus(1)
+    }
     val context = LocalContext.current
 
-    // Geri çıxış üçün təsdiqləmə
     BackConfirmHandler(
         onConfirmExit = {
             viewModel.clearViewModel()
@@ -64,7 +64,7 @@ fun QuestionScreen(
         dialogText = "Səhifədən çıxmaq istəyirsiniz? Verilən cavablar silinəcək."
     )
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(level) {
         viewModel.getLeveledQuestion(level)
     }
 
@@ -78,22 +78,7 @@ fun QuestionScreen(
                 ElevatedButton(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {
-                        if (viewModel.currentIndex != (leveledQuestionStateValue?.data?.questions?.size?.minus(
-                                1
-                            ) ?: 0)
-                        ) {
-                            viewModel.currentIndex += 1
-                            viewModel.listOfSubmitQuizAnswers.add(viewModel.selectedOption)
-                            viewModel.clearSelectedOption()
-                        } else {
-                            viewModel.listOfSubmitQuizAnswers.add(viewModel.selectedOption)
-                            viewModel.submitQuiz(
-                                quizSubmissionRequest = QuizSubmissionRequest(
-                                    level = leveledQuestionStateValue?.data?.level ?: 1,
-                                    answers = viewModel.listOfSubmitQuizAnswers
-                                )
-                            )
-                        }
+                        viewModel.onSubmitOrNext(level, isLastQuestion.value)
                     }
                 ) {
                     when (submitQuizState?.status) {
@@ -108,8 +93,6 @@ fun QuestionScreen(
                                 modifier = Modifier.padding(vertical = 8.dp)
                             )
                             submitQuizState?.data?.let {
-
-                                viewModel.insertQuiz(it)
 
                                 viewModel.quizResult = it
                                 navHostController.navigate(QuizNavHostObject.QuizResultScreen)
@@ -158,6 +141,9 @@ fun QuestionScreen(
                 }
 
                 Status.CONTENT -> {
+                    LaunchedEffect(viewModel.currentIndex) {
+                        viewModel.startTimer(level = level)
+                    }
                     val question =
                         leveledQuestionStateValue?.data?.questions?.get(viewModel.currentIndex)
 
@@ -167,6 +153,10 @@ fun QuestionScreen(
                             .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
+                        item{
+                            AnimatedTimerBar(timeLeft = timeLeft)
+                        }
+
                         item {
                             Card(
                                 modifier = Modifier.fillMaxWidth(),
@@ -224,38 +214,3 @@ fun QuestionScreen(
     }
 }
 
-@Composable
-fun BackConfirmHandler(
-    onConfirmExit: () -> Unit,
-    dialogTitle: String = "Diqqət",
-    dialogText: String = "Əminsinizmi? Geri çıxmaqla bütün məlumatlar silinəcək.",
-) {
-    var showDialog by remember { mutableStateOf(false) }
-
-    BackHandler(enabled = true) {
-        showDialog = true
-    }
-
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            title = { Text(dialogTitle, color = MaterialTheme.colorScheme.error) },
-            text = { Text(dialogText) },
-            confirmButton = {
-                TextButton(onClick = {
-                    showDialog = false
-                    onConfirmExit()
-                }) {
-                    Text("Bəli")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = {
-                    showDialog = false
-                }) {
-                    Text("Xeyr")
-                }
-            }
-        )
-    }
-}

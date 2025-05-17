@@ -1,5 +1,7 @@
 package com.example.quizapp.presentation.quiz.screens
 
+import android.app.Activity
+import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -13,19 +15,28 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.quizapp.presentation.quiz.QuizNavHostObject
+import com.example.quizapp.presentation.auth.MainActivity
 import com.example.quizapp.presentation.quiz.QuestionViewModel
+import com.example.quizapp.presentation.quiz.QuizNavHostObject
+import com.example.quizapp.tools.DataStoreHelper
+import com.example.quizapp.tools.components.BackConfirmHandler
+import kotlinx.coroutines.launch
 
 @Composable
 fun QuizResultScreen(
     navHostController: NavHostController,
-    viewModel: QuestionViewModel
+    viewModel: QuestionViewModel,
+    dataStoreHelper: DataStoreHelper
 ) {
     val result = viewModel.quizResult
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         viewModel.fetchAllResults()

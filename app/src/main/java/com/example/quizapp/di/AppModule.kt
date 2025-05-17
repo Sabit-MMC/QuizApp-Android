@@ -1,17 +1,26 @@
 package com.example.quizapp.di
 
+import android.content.Context
+import android.util.Log
+import com.example.quizapp.data.network.AuthInterceptor
+import com.example.quizapp.data.network.TokenAuthenticator
 import com.example.quizapp.data.repository.auth.AuthRepository
-import com.example.quizapp.data.services.quiz.ApiService
 import com.example.quizapp.data.repository.quiz.QuizRepository
 import com.example.quizapp.data.services.auth.AuthServices
+import com.example.quizapp.data.services.quiz.ApiService
+import com.example.quizapp.tools.DataStoreHelper
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
@@ -27,11 +36,29 @@ object AppModule {
 
     @Provides
     fun provideOkHttpClient(
-        loggingInterceptor: HttpLoggingInterceptor
+        loggingInterceptor: HttpLoggingInterceptor,
+        dataStoreHelper: DataStoreHelper,
+        tokenAuthenticator: TokenAuthenticator
     ): OkHttpClient {
         return OkHttpClient.Builder()
-            .addInterceptor(loggingInterceptor)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .addNetworkInterceptor(loggingInterceptor)
+            .addInterceptor(AuthInterceptor(dataStoreHelper))
+            .authenticator(tokenAuthenticator)
             .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideTokenAuthenticator(
+        @ApplicationContext context: Context,
+        dataStoreHelper: DataStoreHelper
+    ): TokenAuthenticator {
+        return TokenAuthenticator(
+            context = context,
+            dataStoreHelper = dataStoreHelper
+        )
     }
 
     @Provides
@@ -47,7 +74,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAuthService(retrofit: Retrofit): AuthServices = retrofit.create(AuthServices::class.java)
+    fun provideAuthService(retrofit: Retrofit): AuthServices =
+        retrofit.create(AuthServices::class.java)
 
     @Provides
     @Singleton
@@ -55,5 +83,6 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAuthRepository(authServices: AuthServices): AuthRepository = AuthRepository(authServices)
+    fun provideAuthRepository(authServices: AuthServices): AuthRepository =
+        AuthRepository(authServices)
 }

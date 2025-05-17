@@ -6,6 +6,7 @@ data class AllLevelsQuestions(
 
 data class LevelQuestionGroup(
     val level: Int,
+    val isUnlocked: Boolean = false,
     val questions: List<Question>
 )
 

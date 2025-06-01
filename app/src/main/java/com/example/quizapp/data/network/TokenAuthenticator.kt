@@ -2,6 +2,7 @@ package com.example.quizapp.data.network
 
 import android.content.Context
 import android.content.Intent
+import com.example.quizapp.BuildConfig
 import com.example.quizapp.data.model.auth.RefreshRequest
 import com.example.quizapp.data.model.auth.RefreshTokenResponse
 import com.example.quizapp.data.services.auth.AuthServices
@@ -17,7 +18,6 @@ import okhttp3.Route
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import kotlin.jvm.java
 
 class TokenAuthenticator(
     private val context: Context,
@@ -70,7 +70,7 @@ class TokenAuthenticator(
             .build()
 
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:8080")
+            .baseUrl(BuildConfig.BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient)
             .build()

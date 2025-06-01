@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -19,6 +20,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -34,7 +36,7 @@ import com.example.quizapp.presentation.quiz.QuizActivity
 import com.example.quizapp.tools.Status
 
 @Composable
-fun LoginScreen(navHostController: NavHostController,authViewModel: AuthViewModel) {
+fun LoginScreen(navHostController: NavHostController, authViewModel: AuthViewModel) {
     val context = LocalContext.current
     val loginState by authViewModel.loginState.collectAsState()
 
@@ -43,10 +45,30 @@ fun LoginScreen(navHostController: NavHostController,authViewModel: AuthViewMode
         context.finish()
     }
 
+    LaunchedEffect(loginState?.status) {
+        if (loginState?.status == Status.CONTENT) {
+            authViewModel.clearLoginTextField()
+            (context as Activity).startActivity(
+                Intent(context, QuizActivity::class.java)
+            )
+            context.finish()
+        }
+    }
+
+    LaunchedEffect(loginState?.status) {
+        if (loginState?.status == Status.ERROR) {
+            Toast.makeText(
+                context,
+                loginState?.errorMessage ?: "Xəta baş verdi",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -58,20 +80,22 @@ fun LoginScreen(navHostController: NavHostController,authViewModel: AuthViewMode
         Spacer(modifier = Modifier.height(32.dp))
 
         OutlinedTextField(
-            value = authViewModel.userIdTextField.value,
-            onValueChange = { authViewModel.userIdTextField.value = it },
+            value = authViewModel.loginUserIdTextField.value,
+            onValueChange = { authViewModel.loginUserIdTextField.value = it },
             label = { Text("İstifadəçi ID") },
             singleLine = true,
+            shape = RoundedCornerShape(8.dp),
             modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
-            value = authViewModel.passwordTextField.value,
-            onValueChange = { authViewModel.passwordTextField.value = it },
+            value = authViewModel.loginPasswordTextField.value,
+            onValueChange = { authViewModel.loginPasswordTextField.value = it },
             label = { Text("Şifrə") },
             singleLine = true,
+            shape = RoundedCornerShape(8.dp),
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -81,48 +105,34 @@ fun LoginScreen(navHostController: NavHostController,authViewModel: AuthViewMode
             onClick = {
                 authViewModel.login(
                     userRequest = UserRequest(
-                        userId = authViewModel.userIdTextField.value.text,
-                        password = authViewModel.passwordTextField.value.text
+                        userId = authViewModel.loginUserIdTextField.value.text,
+                        password = authViewModel.loginPasswordTextField.value.text
                     )
                 )
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp)
         ) {
-            when (loginState?.status) {
-                Status.LOADING -> {
-                    CircularProgressIndicator(
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier
-                            .padding(4.dp)
-                            .size(20.dp),
-                        strokeWidth = 2.dp
-                    )
-                }
+            if (loginState?.status == Status.LOADING) {
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .size(20.dp),
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Text("Daxil ol", Modifier.padding(vertical = 8.dp), fontSize = 18.sp)
 
-                Status.CONTENT -> {
-                    Text("Daxil ol", fontSize = 18.sp)
-                    authViewModel.clearTextFields()
-                    (context as Activity).startActivity(
-                        Intent(context, QuizActivity::class.java)
-                    )
-                    context.finish()
-                }
-
-                Status.ERROR -> {
-                    Text("Yenidən cəhd edin", fontSize = 18.sp)
-                    Toast.makeText(context, "Xəta baş verdi", Toast.LENGTH_SHORT).show()
-                }
-
-                else -> {
-                    Text("Daxil ol", fontSize = 18.sp)
-                }
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         TextButton(
             onClick = {
+                authViewModel.clearLoginTextField()
                 navHostController.navigate(AuthNavHostObject.RegisterScreen)
             }
         ) {

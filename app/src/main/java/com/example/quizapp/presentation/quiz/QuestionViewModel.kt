@@ -1,29 +1,28 @@
 package com.example.quizapp.presentation.quiz
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.quizapp.data.model.AllLevelsQuestions
+import com.example.quizapp.data.model.Category
 import com.example.quizapp.data.model.LevelQuestionGroup
+import com.example.quizapp.data.model.LevelStatus
 import com.example.quizapp.data.model.QuizResult
 import com.example.quizapp.data.model.QuizSubmissionRequest
 import com.example.quizapp.data.repository.quiz.QuizRepository
 import com.example.quizapp.tools.DataStoreHelper
 import com.example.quizapp.tools.LCE
+import com.example.quizapp.tools.toErrorResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @HiltViewModel
@@ -35,8 +34,13 @@ class QuestionViewModel @Inject constructor(
 
     val userId = mutableStateOf("")
 
-    private val _questionState: MutableStateFlow<LCE<AllLevelsQuestions>?> = MutableStateFlow(null)
-    var questionState = _questionState.asStateFlow()
+    private val _levelStatusState: MutableStateFlow<LCE<List<LevelStatus>>?> =
+        MutableStateFlow(null)
+    var levelStatusState = _levelStatusState.asStateFlow()
+
+    private val _categoriesState: MutableStateFlow<LCE<List<Category>>?> =
+        MutableStateFlow(null)
+    var categoriesState = _categoriesState.asStateFlow()
 
     private val _leveledQuestionState: MutableStateFlow<LCE<LevelQuestionGroup>?> =
         MutableStateFlow(null)
@@ -71,33 +75,35 @@ class QuestionViewModel @Inject constructor(
         selectedOption = -1
     }
 
+    fun getLevels() {
+        _levelStatusState.value = LCE.Companion.loading()
+        viewModelScope.launch(IO) {
+            try {
+                dataStoreHelper.getUserId().collect {
+                    if (!it.isNullOrEmpty()) {
+                        userId.value = it
+                        val response = quizRepository.getLevels(it)
 
-    fun getQuestions() {
-        _questionState.value = LCE.Companion.loading()
-        viewModelScope.launch(Dispatchers.IO) {
-            dataStoreHelper.getUserId().collect { id ->
-                if (!id.isNullOrEmpty()) {
-                    userId.value = id
-                    val response = quizRepository.getQuestions()
-                    if (response.isSuccessful) {
-                        val access = runBlocking { dataStoreHelper.getAccessToken().firstOrNull() }
-                        Log.i("TAG", "Token - $access")
-                        _questionState.value = LCE.Companion.content(response.body())
-                    } else {
-                        _questionState.value =
-                            LCE.Companion.error(errorMessage = response.errorBody()?.string() ?: "")
+                        if (response.isSuccessful && response.body() != null) {
+                            _levelStatusState.value = LCE.content(response.body())
+                        } else {
+                            _levelStatusState.value =
+                                LCE.error(errorMessage = response.errorBody()?.string() ?: "")
+                        }
                     }
                 }
+            } catch (e: Exception) {
+                _levelStatusState.value =
+                    LCE.error(errorMessage = e.localizedMessage)
             }
-
         }
     }
 
     fun getLeveledQuestion(level: Int) {
         _leveledQuestionState.value = LCE.Companion.loading()
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(IO) {
             val response = quizRepository.getLeveledQuestion(level)
-            if (response.isSuccessful) {
+            if (response.isSuccessful && response.body() != null) {
                 _leveledQuestionState.value = LCE.Companion.content(response.body())
             } else {
                 _leveledQuestionState.value =
@@ -106,28 +112,20 @@ class QuestionViewModel @Inject constructor(
         }
     }
 
-    fun submitQuiz(quizSubmissionRequest: QuizSubmissionRequest) {
+    fun submitResult(quizSubmissionRequest: QuizSubmissionRequest) {
         _submitQuizState.value = LCE.Companion.loading()
-        viewModelScope.launch(Dispatchers.IO) {
-            val response = quizRepository.submitQuiz(quizSubmissionRequest)
-            if (response.isSuccessful) {
-                _submitQuizState.value = LCE.Companion.content(response.body())
-            } else {
+        viewModelScope.launch(IO) {
+            try {
+                val response = quizRepository.insertResult(quizSubmissionRequest)
+                if (response.isSuccessful && response.body() != null) {
+                    _submitQuizState.value = LCE.Companion.content(response.body())
+                } else {
+                    _submitQuizState.value =
+                        LCE.Companion.error(errorMessage = response.toErrorResponse())
+                }
+            } catch (e: Exception) {
                 _submitQuizState.value =
-                    LCE.Companion.error(errorMessage = response.errorBody()?.string() ?: "")
-            }
-        }
-    }
-
-    fun fetchAllResults() {
-        _getAllResultState.value = LCE.Companion.loading()
-        viewModelScope.launch(Dispatchers.IO) {
-            val response = quizRepository.fetchAllResults()
-            if (response.isSuccessful) {
-                _getAllResultState.value = LCE.Companion.content(response.body())
-            } else {
-                _getAllResultState.value =
-                    LCE.Companion.error(errorMessage = response.errorBody()?.string() ?: "")
+                    LCE.Companion.error(errorMessage = e.localizedMessage)
             }
         }
     }
@@ -140,7 +138,7 @@ class QuestionViewModel @Inject constructor(
             stopTimer()
         } else {
             listOfSubmitQuizAnswers.add(selectedOption)
-            submitQuiz(
+            submitResult(
                 QuizSubmissionRequest(
                     userId = userId.value,
                     level = level,
@@ -172,7 +170,10 @@ class QuestionViewModel @Inject constructor(
                 _timeLeft.value = _timeLeft.value - 1
             }
 
-            onSubmitOrNext(level, currentIndex == leveledQuestionState.value?.data?.questions?.lastIndex)
+            onSubmitOrNext(
+                level,
+                currentIndex == leveledQuestionState.value?.data?.questions?.lastIndex
+            )
             _timeLeft.value = duration
             startTimer(duration, level)
         }

@@ -19,6 +19,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -36,16 +37,16 @@ fun StartGameScreen(
     navHostController: NavHostController,
     viewModel: QuestionViewModel
 ) {
-    val questionStateValue = viewModel.questionState.collectAsState().value
-    LaunchedEffect(Unit) {
-        viewModel.getQuestions()
+    val levelStatusStateValue = viewModel.levelStatusState.collectAsState().value
+    LaunchedEffect (Unit) {
+        viewModel.getLevels()
     }
 
     val context = LocalContext.current
 
     Box(modifier = Modifier.fillMaxSize()) {
 
-        when (questionStateValue?.status) {
+        when (levelStatusStateValue?.status) {
             Status.LOADING -> {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
@@ -57,10 +58,10 @@ fun StartGameScreen(
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(questionStateValue?.data?.levels?.size ?: 0) { index ->
-                        val level = questionStateValue?.data?.levels?.get(index)?.level ?: 1
+                    items(levelStatusStateValue.data?.size ?: 0) { index ->
+                        val level = levelStatusStateValue.data?.get(index)?.level ?: 1
                         val isLocked =
-                            questionStateValue?.data?.levels?.get(index)?.isUnlocked == false
+                            levelStatusStateValue.data?.get(index)?.isUnlocked == false
                         LevelsItem(navHostController, viewModel, level, isLocked)
                     }
                 }

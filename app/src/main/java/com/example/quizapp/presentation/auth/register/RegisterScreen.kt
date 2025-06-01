@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -27,6 +28,7 @@ import androidx.navigation.NavHostController
 import com.example.quizapp.data.model.auth.UserRequest
 import com.example.quizapp.presentation.auth.AuthViewModel
 import com.example.quizapp.tools.Status
+import kotlinx.coroutines.delay
 
 @Composable
 fun RegisterScreen(navHostController: NavHostController, authViewModel: AuthViewModel) {
@@ -35,8 +37,10 @@ fun RegisterScreen(navHostController: NavHostController, authViewModel: AuthView
 
     LaunchedEffect(registerState?.status) {
         if (registerState?.status == Status.CONTENT) {
-            Toast.makeText(context, "Qeydiyyat uğurlu!", Toast.LENGTH_SHORT).show()
-            authViewModel.clearTextFields()
+            Toast.makeText(context, registerState?.data?.message, Toast.LENGTH_SHORT).show()
+            authViewModel.clearRegisterTextField()
+            delay(1000L)
+            authViewModel.clearRegisterState()
             navHostController.navigateUp()
         }
     }
@@ -62,22 +66,24 @@ fun RegisterScreen(navHostController: NavHostController, authViewModel: AuthView
         Spacer(modifier = Modifier.height(32.dp))
 
         OutlinedTextField(
-            value = authViewModel.userIdTextField.value,
+            value = authViewModel.registerUserIdTextField.value,
             onValueChange = { newValue ->
-                authViewModel.userIdTextField.value = newValue
+                authViewModel.registerUserIdTextField.value = newValue
             },
             label = { Text("İstifadəçi ID") },
+            shape = RoundedCornerShape(8.dp),
             modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
-            value = authViewModel.passwordTextField.value,
+            value = authViewModel.registerPasswordTextField.value,
             onValueChange = { newValue ->
-                authViewModel.passwordTextField.value = newValue
+                authViewModel.registerPasswordTextField.value = newValue
             },
             label = { Text("Şifrə") },
+            shape = RoundedCornerShape(8.dp),
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -87,8 +93,8 @@ fun RegisterScreen(navHostController: NavHostController, authViewModel: AuthView
             onClick = {
                 authViewModel.register(
                     userRequest = UserRequest(
-                        userId = authViewModel.userIdTextField.value.text,
-                        password = authViewModel.passwordTextField.value.text
+                        userId = authViewModel.registerUserIdTextField.value.text,
+                        password = authViewModel.registerPasswordTextField.value.text
                     )
                 )
             },
@@ -106,8 +112,12 @@ fun RegisterScreen(navHostController: NavHostController, authViewModel: AuthView
             }
         }
 
+        Spacer(modifier = Modifier.height(8.dp))
+
         TextButton(
             onClick = {
+                authViewModel.clearRegisterTextField()
+                authViewModel.clearRegisterState()
                 navHostController.navigateUp()
             },
             modifier = Modifier.align(Alignment.CenterHorizontally)

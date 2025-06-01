@@ -1,7 +1,7 @@
 package com.example.quizapp.di
 
 import android.content.Context
-import android.util.Log
+import com.example.quizapp.BuildConfig
 import com.example.quizapp.data.network.AuthInterceptor
 import com.example.quizapp.data.network.TokenAuthenticator
 import com.example.quizapp.data.repository.auth.AuthRepository
@@ -14,8 +14,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -64,7 +62,7 @@ object AppModule {
     @Provides
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit =
-        Retrofit.Builder().baseUrl("http://10.0.2.2:8080")
+        Retrofit.Builder().baseUrl(BuildConfig.BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient).build()
 

@@ -23,9 +23,9 @@ fun ResultScreen(questionViewModel: QuestionViewModel) {
 
     val resultState by questionViewModel.getAllResultState.collectAsState()
 
-    LaunchedEffect(Unit) {
-        questionViewModel.fetchAllResults()
-    }
+//    LaunchedEffect(Unit) {
+//        questionViewModel.fetchAllResults()
+//    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         if (resultState?.data?.isEmpty() == true) {

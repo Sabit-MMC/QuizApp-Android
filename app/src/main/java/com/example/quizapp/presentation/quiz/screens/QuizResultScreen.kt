@@ -1,7 +1,5 @@
 package com.example.quizapp.presentation.quiz.screens
 
-import android.app.Activity
-import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -21,12 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.quizapp.presentation.auth.MainActivity
 import com.example.quizapp.presentation.quiz.QuestionViewModel
 import com.example.quizapp.presentation.quiz.QuizNavHostObject
 import com.example.quizapp.tools.DataStoreHelper
 import com.example.quizapp.tools.components.BackConfirmHandler
-import kotlinx.coroutines.launch
 
 @Composable
 fun QuizResultScreen(
@@ -38,9 +34,9 @@ fun QuizResultScreen(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(Unit) {
-        viewModel.fetchAllResults()
-    }
+//    LaunchedEffect(Unit) {
+//        viewModel.fetchAllResults()
+//    }
 
     BackConfirmHandler(
         onConfirmExit = {
@@ -67,15 +63,7 @@ fun QuizResultScreen(
                     text = "Səviyyə: ${result.level}",
                     style = MaterialTheme.typography.titleLarge
                 )
-                Text(
-                    text = "Ümumi sual: ${result.totalQuestions}",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                Text(
-                    text = "Düzgün cavab: ${result.correctCount}",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.primary
-                )
+
                 Text(
                     text = "Faiz: ${result.percentage.toInt()}%",
                     style = MaterialTheme.typography.bodyLarge,

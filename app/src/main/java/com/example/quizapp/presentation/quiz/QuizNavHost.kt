@@ -6,7 +6,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.quizapp.presentation.auth.AuthViewModel
 import com.example.quizapp.presentation.quiz.screens.QuestionScreen
 import com.example.quizapp.presentation.quiz.screens.QuizResultScreen
 import com.example.quizapp.presentation.quiz.screens.StartGameScreen
@@ -24,8 +23,10 @@ fun QuizNavHost(
         navController = navHostController,
         startDestination = QuizNavHostObject.StartGameScreen
     ) {
-        composable(route = QuizNavHostObject.StartGameScreen) {
-            showBottomBar(true)
+        composable(
+            route = QuizNavHostObject.StartGameScreen
+        ) {
+            showBottomBar(false)
             StartGameScreen(navHostController, questionViewModel)
         }
         composable(

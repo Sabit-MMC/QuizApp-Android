@@ -1,6 +1,7 @@
 package com.example.quizapp.presentation.quiz.screens
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -31,14 +32,19 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.SubcomposeAsyncImage
+import com.example.quizapp.BuildConfig
 import com.example.quizapp.presentation.quiz.QuestionViewModel
 import com.example.quizapp.presentation.quiz.QuizNavHostObject
 import com.example.quizapp.tools.Status
 import com.example.quizapp.tools.components.BackConfirmHandler
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 
 @SuppressLint("UnrememberedMutableState")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -92,15 +98,15 @@ fun QuestionScreen(
                                 fontSize = 16.sp,
                                 modifier = Modifier.padding(vertical = 8.dp)
                             )
-                            submitQuizState?.data?.let {
-
-                                viewModel.quizResult = it
-                                navHostController.navigate(QuizNavHostObject.QuizResultScreen)
-                                viewModel.clearSubmitState()
-                            }
+                            navHostController.navigate(QuizNavHostObject.StartGameScreen)
                         }
 
                         Status.ERROR -> {
+                            Text(
+                                "Quizi Bitir",
+                                fontSize = 16.sp,
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
                             Toast.makeText(context, "Xəta baş verdi", Toast.LENGTH_SHORT).show()
                         }
 
@@ -153,8 +159,38 @@ fun QuestionScreen(
                             .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        item{
+                        item {
                             AnimatedTimerBar(timeLeft = timeLeft)
+                        }
+
+                        val imageUrl = "${BuildConfig.BASE_URL}/${question?.imageUrl}"
+                        if (!question?.imageUrl.isNullOrEmpty()) {
+                            item {
+                                SubcomposeAsyncImage(
+                                    alignment = Alignment.Center,
+                                    model = imageUrl,
+                                    contentScale = ContentScale.Fit,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .height(height = 150.dp)
+                                        .fillMaxWidth(),
+                                    loading = {
+                                        Box(modifier = Modifier.fillMaxSize()) {
+                                            CircularProgressIndicator(
+                                                modifier = Modifier.align(
+                                                    Alignment.Center
+                                                )
+                                            )
+                                        }
+                                        LaunchedEffect(Unit) {
+                                            delay(10000L)
+                                        }
+                                    },
+                                    error = {
+                                        Text("Error occur")
+                                    }
+                                )
+                            }
                         }
 
                         item {
@@ -186,7 +222,7 @@ fun QuestionScreen(
                             ) {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.padding(16.dp)
+                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                                 ) {
                                     RadioButton(
                                         selected = viewModel.selectedOption == index,

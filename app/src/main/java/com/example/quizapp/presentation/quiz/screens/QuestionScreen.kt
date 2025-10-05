@@ -37,7 +37,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import coil.compose.SubcomposeAsyncImage
+import coil3.compose.SubcomposeAsyncImage
 import com.example.quizapp.BuildConfig
 import com.example.quizapp.presentation.quiz.QuestionViewModel
 import com.example.quizapp.presentation.quiz.QuizNavHostObject

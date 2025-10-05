@@ -2,4 +2,5 @@
     <string name="app_name">QuizApp</string>
     <string name="country">Country</string>
     <string name="embassy">Embassy</string>
+    <string name="no_data_found">Məlumat tapılmadı</string>
 </resources>

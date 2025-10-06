@@ -78,11 +78,6 @@ fun AnimatedTimerBar(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-//                    Icon(
-//                        imageVector = Icons.Default.Info,
-//                        contentDescription = "Timer Icon",
-//                        tint = barColor
-//                    )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "Vaxt qaldı: $timeLeft saniyə",

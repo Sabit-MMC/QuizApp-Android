@@ -35,12 +35,10 @@ fun MainScreen(
     navHostController: NavHostController,
     authViewModel: AuthViewModel,
     questionViewModel: QuestionViewModel,
-    addQuestionViewModel: AddQuestionViewModel,
     dataStoreHelper: DataStoreHelper
 ) {
     val navController = rememberNavController()
-    val items = listOf(BottomNavItem.Quiz, BottomNavItem.Result,BottomNavItem.Profile,
-        BottomNavItem.AddQuestion)
+    val items = listOf(BottomNavItem.Quiz,BottomNavItem.Profile)
     var showBottomBar by remember { mutableStateOf(true) }
 
     Scaffold(
@@ -63,26 +61,12 @@ fun MainScreen(
                 QuizNavHost(
                     navHostController = navHostController,
                     questionViewModel = questionViewModel,
-                    dataStoreHelper = dataStoreHelper,
                     showBottomBar = {visible -> showBottomBar = visible}
                 )
             }
-            composable (BottomNavItem.Result.route){
-                ResultScreen(questionViewModel)
-            }
+
             composable(BottomNavItem.Profile.route) {
                 ProfileScreen(viewModel = authViewModel, dataStoreHelper = dataStoreHelper)
-            }
-            composable(BottomNavItem.AddQuestion.route) {
-                AddQuestionScreen { question, options, correctIndex, level, imageFile ->
-                    addQuestionViewModel.uploadQuiz(
-                        question = question,
-                        options = options,
-                        correctAnswerIndex = correctIndex,
-                        level = level,
-                        imageFile = imageFile
-                    )
-                }
             }
         }
     }

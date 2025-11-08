@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
-import com.example.quizapp.presentation.AddQuestionViewModel
 import com.example.quizapp.presentation.MainScreen
 import com.example.quizapp.presentation.auth.AuthViewModel
 import com.example.quizapp.tools.DataStoreHelper
@@ -23,7 +22,6 @@ import javax.inject.Inject
 class QuizActivity : ComponentActivity() {
     private val questionViewModel: QuestionViewModel by viewModels()
     private val authViewModel: AuthViewModel by viewModels()
-    private val addQuestionViewModel: AddQuestionViewModel by viewModels()
 
     @Inject
     lateinit var dataStoreHelper: DataStoreHelper
@@ -44,7 +42,6 @@ class QuizActivity : ComponentActivity() {
                             navHostController,
                             authViewModel = authViewModel,
                             questionViewModel = questionViewModel,
-                            addQuestionViewModel = addQuestionViewModel,
                             dataStoreHelper = dataStoreHelper
                         )
                     }

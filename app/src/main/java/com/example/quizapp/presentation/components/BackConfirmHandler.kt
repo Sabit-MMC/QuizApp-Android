@@ -1,4 +1,4 @@
-package com.example.quizapp.tools.components
+package com.example.quizapp.presentation.components
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.material3.AlertDialog

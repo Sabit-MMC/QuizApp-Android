@@ -3,10 +3,8 @@ import java.io.FileInputStream
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -21,7 +19,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField ("String","BASE_URL", "\"http://10.0.2.2:8080\"")
+        buildConfigField ("String","BASE_URL", "\"https://quizapp-ktor.onrender.com\"")
     }
 
     val keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -44,10 +42,10 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField ("String","BASE_URL", "\"http://10.0.2.2:8080\"")
+            buildConfigField ("String","BASE_URL", "\"https://quizapp-ktor.onrender.com\"")
         }
         release {
-            buildConfigField ("String","BASE_URL", "\"http://10.0.2.2:8080\"")
+            buildConfigField ("String","BASE_URL", "\"https://quizapp-ktor.onrender.com/\"")
             signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
             proguardFiles(
@@ -60,12 +58,16 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
+
     buildFeatures {
         buildConfig = true
         compose = true
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
     }
 }
 
@@ -79,6 +81,11 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.constraintlayout.compose.android)
+    implementation(libs.androidx.compose.runtime.saveable)
+    implementation(libs.androidx.compose.foundation.layout)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -87,23 +94,26 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    //retrofit
-    implementation(libs.retrofit)
-    implementation(libs.gson)
-    implementation(libs.okHttp)
-    implementation(libs.logging.interceptor)
+    //ktor
+    implementation(libs.ktor.client)
+    implementation(libs.ktor.client.logging)
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
 
-    //hilt
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
-
-    //navigation
-    implementation(libs.navigation.ui)
-    implementation(libs.navigation.compose)
+    //navigation3
+    implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.navigation3.viewmodel)
 
     //data-store
     implementation(libs.datastore.preferences)
 
     implementation(libs.kotlin.serialization)
     implementation(libs.coil.compose)
+
+    //koin
+    implementation(libs.koin.core)
+    implementation(libs.koin.android)
+    implementation(libs.koin.compose)
 }

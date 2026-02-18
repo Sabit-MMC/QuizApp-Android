@@ -3,4 +3,32 @@
     <string name="country">Country</string>
     <string name="embassy">Embassy</string>
     <string name="no_data_found">Məlumat tapılmadı</string>
+    <string name="unknown_route">Unknown route</string>
+    <string name="blue_content">Blue Content</string>
+    <string name="green_content">Green Content</string>
+
+    <!-- Sign In Screen -->
+    <string name="login_title">Log in</string>
+    <string name="login_subtitle">Login to access your account</string>
+    <string name="email_label">Email</string>
+    <string name="email_placeholder">Enter your email</string>
+    <string name="password_label">Password</string>
+    <string name="password_placeholder">......</string>
+    <string name="remember_me">Remember me</string>
+    <string name="forgot_password">Forget password?</string>
+    <string name="or_divider">Or</string>
+    <string name="google_login">Google</string>
+    <string name="facebook_login">Facebook</string>
+    <string name="dont_have_account">Don\'t have an account? </string>
+    <string name="sign_up_action">Sign Up</string>
+
+    <!-- Sign Up Screen -->
+    <string name="signup_title">Sign up</string>
+    <string name="signup_subtitle">Create an account or log in to explore about our app.</string>
+    <string name="name_label">Name</string>
+    <string name="name_placeholder">Enter your name</string>
+    <string name="signup_password_placeholder">........</string>
+    <string name="agree_policy">I agree with privacy and policy</string>
+    <string name="already_have_account">Already have an account? </string>
+    <string name="login_action">Log in</string>
 </resources>

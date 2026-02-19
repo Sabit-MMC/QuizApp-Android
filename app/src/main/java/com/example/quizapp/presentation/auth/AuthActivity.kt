@@ -1,24 +1,47 @@
 package com.example.quizapp.presentation.auth
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import com.example.quizapp.presentation.quiz.HomeActivity
 import com.example.quizapp.ui.theme.QuizAppTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class AuthActivity : ComponentActivity() {
-    val authViewModel: AuthViewModel by viewModel()
+    private val authViewModel: AuthViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
+            val context = LocalContext.current
+            
+            LaunchedEffect(authViewModel.navigationEvent) {
+                authViewModel.navigationEvent.collect { event ->
+                    when (event) {
+                        is AuthNavigationEvent.NavigateToHome -> {
+                            startActivity(Intent(this@AuthActivity, HomeActivity::class.java))
+                            finish()
+                        }
+                        is AuthNavigationEvent.NavigateToSignIn -> {
+                            // This can be handled within the NavDisplay if needed, 
+                            // or just show a message that registration was successful.
+                            Toast.makeText(context, "Registration successful! Please login.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
+
             QuizAppTheme {
                 Scaffold {
-                    AuthNavigation(modifier = Modifier.padding(it),authViewModel = authViewModel)
+                    AuthNavigation(modifier = Modifier.padding(it), authViewModel = authViewModel)
                 }
             }
         }

@@ -1,6 +1,7 @@
 package com.example.quizapp.data.network
 
-import io.ktor.utils.io.errors.IOException
+import kotlinx.io.IOException
+
 
 sealed class NetworkResult<out T> {
     data class Success<out T>(val data: T) : NetworkResult<T>()

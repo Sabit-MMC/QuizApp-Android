@@ -21,7 +21,8 @@ import com.example.quizapp.presentation.components.DifficultySelectionBottomShee
 import com.example.quizapp.presentation.quiz.model.Category
 import com.example.quizapp.presentation.quiz.screens.AllCategoriesScreen
 import com.example.quizapp.presentation.quiz.screens.HomeScreen
-import com.example.quizapp.presentation.quiz.screens.NotificationScreen
+import com.example.quizapp.presentation.notifications.NotificationScreen
+import com.example.quizapp.presentation.profile.ProfileScreen
 import com.example.quizapp.ui.theme.QuizAppTheme
 import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
@@ -34,6 +35,9 @@ data object AllCategoriesKey : NavKey
 
 @Serializable
 data object NotificationsKey : NavKey
+
+@Serializable
+data object ProfileKey : NavKey
 
 class HomeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,6 +81,9 @@ fun HomeNavigation(modifier: Modifier = Modifier) {
                         },
                         onNotificationClick = {
                             backStack.add(NotificationsKey)
+                        },
+                        onProfileClick = {
+                            backStack.add(ProfileKey)
                         }
                     )
                 }
@@ -95,6 +102,16 @@ fun HomeNavigation(modifier: Modifier = Modifier) {
                     NotificationScreen(
                         onBackClick = {
                             backStack.removeLastOrNull()
+                        }
+                    )
+                }
+                is ProfileKey -> NavEntry(key) {
+                    ProfileScreen(
+                        onBackClick = {
+                            backStack.removeLastOrNull()
+                        },
+                        onSignOutClick = {
+                            Toast.makeText(context, "Signing out...", Toast.LENGTH_SHORT).show()
                         }
                     )
                 }

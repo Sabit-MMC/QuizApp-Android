@@ -20,6 +20,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.quizapp.R
+import com.example.quizapp.ui.theme.QuizAppTheme
 
 @Composable
 fun SignUpScreen(
@@ -34,7 +35,7 @@ fun SignUpScreen(
 
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = BgColor
+        color = MaterialTheme.colorScheme.background
     ) {
         Column(
             modifier = Modifier
@@ -49,14 +50,14 @@ fun SignUpScreen(
                 text = stringResource(R.string.signup_title),
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold,
-                    color = TextColorPrimary
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = stringResource(R.string.signup_subtitle),
                 style = MaterialTheme.typography.bodyMedium.copy(
-                    color = TextColorSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
                 ),
                 modifier = Modifier.padding(horizontal = 16.dp)
@@ -98,19 +99,21 @@ fun SignUpScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Row(
-                modifier = Modifier.fillMaxWidth().clickable { isPolicyAccepted = !isPolicyAccepted },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { isPolicyAccepted = !isPolicyAccepted },
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(
                     modifier = Modifier
                         .size(20.dp)
                         .background(
-                            if (isPolicyAccepted) PrimaryBlue else Color.Transparent,
+                            if (isPolicyAccepted) MaterialTheme.colorScheme.primary else Color.Transparent,
                             CircleShape
                         )
                         .border(
                             width = 1.dp,
-                            color = if (isPolicyAccepted) PrimaryBlue else Color.Gray,
+                            color = if (isPolicyAccepted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
                             shape = CircleShape
                         ),
                     contentAlignment = Alignment.Center
@@ -119,7 +122,7 @@ fun SignUpScreen(
                         Icon(
                             imageVector = Icons.Default.Check,
                             contentDescription = null,
-                            tint = Color.White,
+                            tint = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.size(14.dp)
                         )
                     }
@@ -129,7 +132,7 @@ fun SignUpScreen(
 
                 Text(
                     text = stringResource(R.string.agree_policy),
-                    style = MaterialTheme.typography.bodyMedium.copy(color = TextColorSecondary)
+                    style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
                 )
             }
 
@@ -141,7 +144,7 @@ fun SignUpScreen(
                     .fillMaxWidth()
                     .height(56.dp)
                     .shadow(elevation = 6.dp, shape = RoundedCornerShape(16.dp)),
-                colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Text(
@@ -156,13 +159,19 @@ fun SignUpScreen(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                HorizontalDivider(modifier = Modifier.weight(1f), color = Color.LightGray)
+                HorizontalDivider(
+                    modifier = Modifier.weight(1f),
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
                 Text(
                     text = stringResource(R.string.or_divider),
                     modifier = Modifier.padding(horizontal = 16.dp),
-                    color = TextColorSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                HorizontalDivider(modifier = Modifier.weight(1f), color = Color.LightGray)
+                HorizontalDivider(
+                    modifier = Modifier.weight(1f),
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
             }
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -171,8 +180,14 @@ fun SignUpScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                SocialButton(text = stringResource(R.string.google_login), modifier = Modifier.weight(1f))
-                SocialButton(text = stringResource(R.string.facebook_login), modifier = Modifier.weight(1f))
+                SocialButton(
+                    text = stringResource(R.string.google_login),
+                    modifier = Modifier.weight(1f)
+                )
+                SocialButton(
+                    text = stringResource(R.string.facebook_login),
+                    modifier = Modifier.weight(1f)
+                )
             }
 
             Spacer(modifier = Modifier.weight(1f))
@@ -183,12 +198,12 @@ fun SignUpScreen(
             ) {
                 Text(
                     text = stringResource(R.string.already_have_account),
-                    color = TextColorSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
                     text = stringResource(R.string.login_action),
-                    color = PrimaryBlue,
+                    color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
                     modifier = Modifier.clickable { signInClick() }
                 )
@@ -200,7 +215,7 @@ fun SignUpScreen(
 @Preview(showBackground = true)
 @Composable
 fun PreviewSignUp() {
-    MaterialTheme {
+    QuizAppTheme {
         SignUpScreen()
     }
 }

@@ -1,4 +1,4 @@
-package com.example.quizapp.presentation.quiz.screens
+package com.example.quizapp.presentation.notifications
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,10 +27,12 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -40,13 +42,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.quizapp.presentation.quiz.model.Notification
+import com.example.quizapp.ui.theme.QuizAppTheme
 import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -77,10 +79,13 @@ fun NotificationScreen(onBackClick: () -> Unit) {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                )
             )
         },
-        containerColor = Color(0xFFF8F9FD)
+        containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         LazyColumn(
             modifier = Modifier
@@ -103,7 +108,7 @@ fun NotificationScreen(onBackClick: () -> Unit) {
         ModalBottomSheet(
             onDismissRequest = { selectedNotification = null },
             sheetState = sheetState,
-            containerColor = Color.White,
+            containerColor = MaterialTheme.colorScheme.surface,
             shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
         ) {
             NotificationDetailContent(
@@ -124,7 +129,7 @@ fun NotificationItem(
             .fillMaxWidth()
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(20.dp),
-        color = Color.White,
+        color = MaterialTheme.colorScheme.surface,
         shadowElevation = 2.dp
     ) {
         Row(
@@ -137,15 +142,15 @@ fun NotificationItem(
                     .size(48.dp)
                     .clip(CircleShape)
                     .background(
-                        if (notification.isRead) Color(0xFFF2F3F7) 
-                        else Color(0xFF4285F4).copy(alpha = 0.1f)
+                        if (notification.isRead) MaterialTheme.colorScheme.surfaceVariant
+                        else MaterialTheme.colorScheme.primaryContainer
                     ),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = if (notification.isRead) Icons.Default.Drafts else Icons.Default.MarkEmailUnread,
                     contentDescription = null,
-                    tint = if (notification.isRead) Color.Gray else Color(0xFF4285F4),
+                    tint = if (notification.isRead) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -157,12 +162,12 @@ fun NotificationItem(
                     text = notification.title,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
-                    color = Color(0xFF1D1D1D)
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = notification.subtitle,
                     fontSize = 14.sp,
-                    color = Color.Gray,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     lineHeight = 18.sp,
                     maxLines = 2
                 )
@@ -173,7 +178,7 @@ fun NotificationItem(
             Text(
                 text = notification.date,
                 fontSize = 12.sp,
-                color = Color.LightGray,
+                color = MaterialTheme.colorScheme.outline,
                 fontWeight = FontWeight.Medium
             )
         }
@@ -196,13 +201,13 @@ fun NotificationDetailContent(
             modifier = Modifier
                 .size(64.dp)
                 .clip(CircleShape)
-                .background(Color(0xFF4285F4).copy(alpha = 0.1f)),
+                .background(MaterialTheme.colorScheme.primaryContainer),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Default.Notifications,
                 contentDescription = null,
-                tint = Color(0xFF4285F4),
+                tint = MaterialTheme.colorScheme.onPrimaryContainer,
                 modifier = Modifier.size(32.dp)
             )
         }
@@ -213,7 +218,7 @@ fun NotificationDetailContent(
             text = notification.title,
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF1D1D1D),
+            color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center
         )
         
@@ -222,7 +227,7 @@ fun NotificationDetailContent(
         Text(
             text = notification.date,
             fontSize = 14.sp,
-            color = Color.Gray
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         
         Spacer(modifier = Modifier.height(24.dp))
@@ -230,7 +235,7 @@ fun NotificationDetailContent(
         Text(
             text = notification.subtitle,
             fontSize = 16.sp,
-            color = Color(0xFF4A4A4A),
+            color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center,
             lineHeight = 24.sp
         )
@@ -243,7 +248,7 @@ fun NotificationDetailContent(
                 .fillMaxWidth()
                 .height(56.dp),
             shape = RoundedCornerShape(16.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4285F4))
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
         ) {
             Text(
                 text = "Close",
@@ -257,5 +262,7 @@ fun NotificationDetailContent(
 @Preview(showBackground = true)
 @Composable
 fun NotificationScreenPreview() {
-    NotificationScreen { }
+    QuizAppTheme {
+        NotificationScreen { }
+    }
 }

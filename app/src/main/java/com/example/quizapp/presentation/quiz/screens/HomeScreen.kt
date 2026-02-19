@@ -22,10 +22,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
@@ -50,14 +52,15 @@ fun HomeScreen(
     viewModel: HomeViewModel,
     onViewAllClick: () -> Unit,
     onCategoryClick: (Category) -> Unit,
-    onNotificationClick: () -> Unit
+    onNotificationClick: () -> Unit,
+    onProfileClick: () -> Unit
 ) {
     val uiState = viewModel.uiState
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF8F9FD))
+            .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = 20.dp)
             .systemBarsPadding()
     ) {
@@ -69,36 +72,50 @@ fun HomeScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(16.dp))
+                    .clickable(onClick = onProfileClick)
+                    .padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Box(
                     modifier = Modifier
                         .size(48.dp)
                         .clip(CircleShape)
-                        .background(Color.LightGray)
-                )
+                        .background(MaterialTheme.colorScheme.primaryContainer),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        Icons.Default.Person,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
                 Spacer(modifier = Modifier.width(12.dp))
                 Column {
                     Text(
                         text = "Good Morning,",
                         fontSize = 14.sp,
-                        color = Color.Gray
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
                         text = "Alex! 👋",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1D1D1D)
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
             IconButton(
                 onClick = onNotificationClick,
-                modifier = Modifier.background(Color.White, CircleShape)
+                modifier = Modifier.background(MaterialTheme.colorScheme.surface, CircleShape)
             ) {
                 Icon(
                     Icons.Default.Notifications,
                     contentDescription = null,
-                    tint = Color(0xFF1D1D1D)
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
         }
@@ -110,18 +127,23 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 16.dp),
-            placeholder = { Text("Find a quiz topic...", color = Color.Gray) },
+            placeholder = {
+                Text(
+                    "Find a quiz topic...",
+                    color = MaterialTheme.colorScheme.outline
+                )
+            },
             leadingIcon = {
                 Icon(
                     Icons.Default.Search,
                     contentDescription = null,
-                    tint = Color.Gray
+                    tint = MaterialTheme.colorScheme.outline
                 )
             },
             shape = RoundedCornerShape(16.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                unfocusedContainerColor = Color.White,
-                focusedContainerColor = Color.White,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
                 unfocusedBorderColor = Color.Transparent,
                 focusedBorderColor = Color.Transparent
             )
@@ -137,10 +159,10 @@ fun HomeScreen(
                 text = "Categories",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF1D1D1D)
+                color = MaterialTheme.colorScheme.onSurface
             )
             TextButton(onClick = onViewAllClick) {
-                Text(text = "View all", color = Color(0xFF4285F4))
+                Text(text = "View all", color = MaterialTheme.colorScheme.primary)
             }
         }
 
@@ -161,7 +183,7 @@ fun HomeScreen(
 
             is HomeUiState.Error -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(text = uiState.message, color = Color.Red)
+                    Text(text = uiState.message, color = MaterialTheme.colorScheme.error)
                 }
             }
         }
@@ -198,7 +220,7 @@ fun CategoryItem(
             .clip(RoundedCornerShape(24.dp))
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(24.dp),
-        color = Color.White,
+        color = MaterialTheme.colorScheme.surface,
         shadowElevation = 2.dp
     ) {
         Column(
@@ -210,7 +232,7 @@ fun CategoryItem(
                 modifier = Modifier
                     .size(44.dp)
                     .clip(RoundedCornerShape(14.dp))
-                    .background(Color(0xFFF2F3F7)),
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center
             ) {
                 AsyncImage(
@@ -226,7 +248,7 @@ fun CategoryItem(
                     text = category.name.en,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1D1D1D),
+                    color = MaterialTheme.colorScheme.onSurface,
                     lineHeight = 20.sp,
                     maxLines = 2
                 )

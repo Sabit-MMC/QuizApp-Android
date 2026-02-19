@@ -22,12 +22,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.quizapp.R
-
-val BgColor = Color(0xFFF2F3F7)
-val PrimaryBlue = Color(0xFF4285F4)
-val TextColorPrimary = Color(0xFF1D1D1D)
-val TextColorSecondary = Color(0xFF7C8aa0)
-val InputBgColor = Color.White
+import com.example.quizapp.ui.theme.QuizAppTheme
 
 @Composable
 fun SignInScreen(
@@ -42,7 +37,7 @@ fun SignInScreen(
 
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = BgColor
+        color = MaterialTheme.colorScheme.background
     ) {
         Column(
             modifier = Modifier
@@ -57,14 +52,14 @@ fun SignInScreen(
                 text = stringResource(R.string.login_title),
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold,
-                    color = TextColorPrimary
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = stringResource(R.string.login_subtitle),
                 style = MaterialTheme.typography.bodyMedium.copy(
-                    color = TextColorSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             )
 
@@ -107,20 +102,20 @@ fun SignInScreen(
                         checked = isRememberMeChecked,
                         onCheckedChange = { isRememberMeChecked = it },
                         colors = CheckboxDefaults.colors(
-                            checkedColor = PrimaryBlue,
-                            uncheckedColor = TextColorSecondary
+                            checkedColor = MaterialTheme.colorScheme.primary,
+                            uncheckedColor = MaterialTheme.colorScheme.outline
                         )
                     )
                     Text(
                         text = stringResource(R.string.remember_me),
-                        style = MaterialTheme.typography.bodySmall.copy(color = TextColorSecondary)
+                        style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
                     )
                 }
 
                 Text(
                     text = stringResource(R.string.forgot_password),
                     style = MaterialTheme.typography.bodySmall.copy(
-                        color = PrimaryBlue,
+                        color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.SemiBold
                     ),
                     modifier = Modifier.clickable { onForgotPasswordClick() }
@@ -135,7 +130,7 @@ fun SignInScreen(
                     .fillMaxWidth()
                     .height(56.dp)
                     .shadow(elevation = 6.dp, shape = RoundedCornerShape(16.dp)),
-                colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Text(
@@ -150,13 +145,13 @@ fun SignInScreen(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                HorizontalDivider(modifier = Modifier.weight(1f), color = Color.LightGray)
+                HorizontalDivider(modifier = Modifier.weight(1f), color = MaterialTheme.colorScheme.outlineVariant)
                 Text(
                     text = stringResource(R.string.or_divider),
                     modifier = Modifier.padding(horizontal = 16.dp),
-                    color = TextColorSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                HorizontalDivider(modifier = Modifier.weight(1f), color = Color.LightGray)
+                HorizontalDivider(modifier = Modifier.weight(1f), color = MaterialTheme.colorScheme.outlineVariant)
             }
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -183,12 +178,12 @@ fun SignInScreen(
             ) {
                 Text(
                     text = stringResource(R.string.dont_have_account),
-                    color = TextColorSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
                     text = stringResource(R.string.sign_up_action),
-                    color = PrimaryBlue,
+                    color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
                     modifier = Modifier.clickable { onSignUpClick() }
                 )
@@ -213,7 +208,7 @@ fun LabeledInput(
             text = label,
             style = MaterialTheme.typography.titleSmall.copy(
                 fontWeight = FontWeight.Bold,
-                color = TextColorPrimary
+                color = MaterialTheme.colorScheme.onBackground
             ),
             modifier = Modifier.padding(bottom = 8.dp)
         )
@@ -221,10 +216,10 @@ fun LabeledInput(
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
-            placeholder = { Text(placeholder, color = Color.LightGray) },
+            placeholder = { Text(placeholder, color = MaterialTheme.colorScheme.outline) },
             modifier = Modifier
                 .fillMaxWidth()
-                .background(InputBgColor, RoundedCornerShape(16.dp)),
+                .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(16.dp)),
             shape = RoundedCornerShape(16.dp),
             singleLine = true,
             visualTransformation = if (isPassword && !isPasswordVisible) PasswordVisualTransformation() else VisualTransformation.None,
@@ -232,8 +227,8 @@ fun LabeledInput(
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.Transparent,
                 unfocusedBorderColor = Color.Transparent,
-                focusedContainerColor = InputBgColor,
-                unfocusedContainerColor = InputBgColor
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface
             ),
             trailingIcon = if (isPassword) {
                 {
@@ -241,7 +236,7 @@ fun LabeledInput(
                         Icon(
                             imageVector = if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
                             contentDescription = "Toggle Password",
-                            tint = Color.Gray
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -259,7 +254,7 @@ fun SocialButton(
         onClick = {},
         modifier = modifier.height(56.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color.White
+            containerColor = MaterialTheme.colorScheme.surface
         ),
         shape = RoundedCornerShape(16.dp),
         contentPadding = PaddingValues(0.dp)
@@ -270,13 +265,13 @@ fun SocialButton(
         ) {
             Box(modifier = Modifier
                 .size(24.dp)
-                .background(Color.Gray, RoundedCornerShape(4.dp)))
+                .background(MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(4.dp)))
 
             Spacer(modifier = Modifier.width(8.dp))
 
             Text(
                 text = text,
-                color = TextColorPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
             )
         }
@@ -286,7 +281,7 @@ fun SocialButton(
 @Preview(showBackground = true)
 @Composable
 fun PreviewSignIn() {
-    MaterialTheme {
+    QuizAppTheme {
         SignInScreen()
     }
 }

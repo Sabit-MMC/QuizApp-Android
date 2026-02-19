@@ -10,7 +10,10 @@ import com.example.quizapp.data.tools.DataStoreConfig
 import com.example.quizapp.presentation.auth.model.AuthRequestBody
 import com.example.quizapp.presentation.auth.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class AuthViewModel(
@@ -23,6 +26,9 @@ class AuthViewModel(
 
     private val _navigationEvent = MutableSharedFlow<AuthNavigationEvent>()
     val navigationEvent = _navigationEvent.asSharedFlow()
+
+    val isDarkMode: StateFlow<Boolean?> = dataStoreConfig.isDarkMode
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     fun signIn(email: String, pass: String) {
         viewModelScope.launch {

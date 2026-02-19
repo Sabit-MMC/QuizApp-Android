@@ -23,7 +23,7 @@ import com.example.quizapp.R
 
 @Composable
 fun SignUpScreen(
-    onSignUpClick: (String, String, String) -> Unit = { _, _, _ -> },
+    onSignUpClick: (String, String) -> Unit = { _, _ -> },
     signInClick: () -> Unit = {}
 ) {
     var name by remember { mutableStateOf("") }
@@ -136,7 +136,7 @@ fun SignUpScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             Button(
-                onClick = { onSignUpClick(name, email, password) },
+                onClick = { onSignUpClick(email, password) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)

@@ -6,14 +6,27 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.quizapp.data.network.NetworkResult
+import com.example.quizapp.data.tools.DataStoreConfig
 import com.example.quizapp.presentation.quiz.model.Category
 import com.example.quizapp.presentation.quiz.repository.QuizRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class HomeViewModel(private val quizRepository: QuizRepository) : ViewModel() {
+class HomeViewModel(
+    private val quizRepository: QuizRepository,
+    private val dataStoreConfig: DataStoreConfig
+) : ViewModel() {
 
     var uiState by mutableStateOf<HomeUiState>(HomeUiState.Loading)
         private set
+
+    val isDarkMode: StateFlow<Boolean?> = dataStoreConfig.isDarkMode
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    val isLoggedIn: Flow<Boolean> = dataStoreConfig.isLoggedIn
 
     init {
         getCategories()
@@ -31,6 +44,18 @@ class HomeViewModel(private val quizRepository: QuizRepository) : ViewModel() {
                 }
                 else -> {}
             }
+        }
+    }
+
+    fun toggleDarkMode(darkMode: Boolean) {
+        viewModelScope.launch {
+            dataStoreConfig.setDarkMode(darkMode)
+        }
+    }
+
+    fun signOut() {
+        viewModelScope.launch {
+            dataStoreConfig.setLoggedIn(false)
         }
     }
 }

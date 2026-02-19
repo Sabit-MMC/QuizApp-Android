@@ -1,137 +1,44 @@
 package com.example.quizapp.presentation.quiz
 
+import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.navigation3.runtime.NavEntry
-import androidx.navigation3.runtime.NavKey
-import androidx.navigation3.ui.NavDisplay
-import com.example.quizapp.presentation.components.DifficultySelectionBottomSheet
-import com.example.quizapp.presentation.quiz.model.Category
-import com.example.quizapp.presentation.quiz.screens.AllCategoriesScreen
-import com.example.quizapp.presentation.quiz.screens.HomeScreen
-import com.example.quizapp.presentation.notifications.NotificationScreen
-import com.example.quizapp.presentation.profile.ProfileScreen
+import com.example.quizapp.presentation.auth.AuthActivity
 import com.example.quizapp.ui.theme.QuizAppTheme
-import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
-
-@Serializable
-data object HomeKey : NavKey
-
-@Serializable
-data object AllCategoriesKey : NavKey
-
-@Serializable
-data object NotificationsKey : NavKey
-
-@Serializable
-data object ProfileKey : NavKey
 
 class HomeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            QuizAppTheme {
+            val homeViewModel: HomeViewModel = koinViewModel()
+            val savedDarkMode by homeViewModel.isDarkMode.collectAsState()
+            val isLoggedIn by homeViewModel.isLoggedIn.collectAsState(initial = true)
+
+            if (!isLoggedIn) {
+                val intent = Intent(this, AuthActivity::class.java)
+                startActivity(intent)
+                finish()
+            }
+
+            QuizAppTheme(
+                darkTheme = savedDarkMode ?: isSystemInDarkTheme()
+            ) {
                 Scaffold { innerPadding ->
-                    HomeNavigation(modifier = Modifier.padding(innerPadding))
+                    HomeNavigation(
+                        viewModel = homeViewModel,
+                        modifier = Modifier.padding(innerPadding)
+                    )
                 }
             }
         }
     }
 }
 
-@Composable
-fun HomeNavigation(modifier: Modifier = Modifier) {
-    val backStack = remember { mutableStateListOf<Any>(HomeKey) }
-    val homeViewModel: HomeViewModel = koinViewModel()
-    val context = LocalContext.current
-
-    var selectedCategory by remember { mutableStateOf<Category?>(null) }
-
-    NavDisplay(
-        modifier = modifier,
-        backStack = backStack,
-        onBack = {
-            if (backStack.size > 1) {
-                backStack.removeLastOrNull()
-            }
-        },
-        entryProvider = { key ->
-            when (key) {
-                is HomeKey -> NavEntry(key) {
-                    HomeScreen(
-                        viewModel = homeViewModel,
-                        onViewAllClick = {
-                            backStack.add(AllCategoriesKey)
-                        },
-                        onCategoryClick = { category ->
-                            selectedCategory = category
-                        },
-                        onNotificationClick = {
-                            backStack.add(NotificationsKey)
-                        },
-                        onProfileClick = {
-                            backStack.add(ProfileKey)
-                        }
-                    )
-                }
-                is AllCategoriesKey -> NavEntry(key) {
-                    AllCategoriesScreen(
-                        viewModel = homeViewModel,
-                        onBackClick = {
-                            backStack.removeLastOrNull()
-                        },
-                        onCategoryClick = { category ->
-                            selectedCategory = category
-                        }
-                    )
-                }
-                is NotificationsKey -> NavEntry(key) {
-                    NotificationScreen(
-                        onBackClick = {
-                            backStack.removeLastOrNull()
-                        }
-                    )
-                }
-                is ProfileKey -> NavEntry(key) {
-                    ProfileScreen(
-                        onBackClick = {
-                            backStack.removeLastOrNull()
-                        },
-                        onSignOutClick = {
-                            Toast.makeText(context, "Signing out...", Toast.LENGTH_SHORT).show()
-                        }
-                    )
-                }
-                else -> NavEntry(Unit) { /* Handle unknown keys */ }
-            }
-        }
-    )
-
-    selectedCategory?.let { category ->
-        DifficultySelectionBottomSheet(
-            category = category,
-            onDismissRequest = { selectedCategory = null },
-            onStartQuiz = { difficulty ->
-                selectedCategory = null
-                Toast.makeText(
-                    context,
-                    "Starting ${category.name.en} quiz with ${difficulty.title} difficulty",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        )
-    }
-}

@@ -14,7 +14,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -38,7 +37,7 @@ fun DifficultySelectionBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState,
         shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
-        containerColor = Color.White,
+        containerColor = MaterialTheme.colorScheme.surface,
         dragHandle = {
             Box(
                 modifier = Modifier
@@ -46,7 +45,7 @@ fun DifficultySelectionBottomSheet(
                     .width(40.dp)
                     .height(4.dp)
                     .clip(CircleShape)
-                    .background(Color.LightGray.copy(alpha = 0.5f))
+                    .background(MaterialTheme.colorScheme.outlineVariant)
             )
         }
     ) {
@@ -62,7 +61,7 @@ fun DifficultySelectionBottomSheet(
                 modifier = Modifier
                     .size(64.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFFF2F3F7)),
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center
             ) {
                 AsyncImage(
@@ -80,13 +79,13 @@ fun DifficultySelectionBottomSheet(
                 text = "${category?.name?.en} Trivia",
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF1D1D1D)
+                color = MaterialTheme.colorScheme.onSurface
             )
             
             Text(
                 text = "Select your challenge level",
                 fontSize = 14.sp,
-                color = Color.Gray,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 4.dp)
             )
 
@@ -111,7 +110,7 @@ fun DifficultySelectionBottomSheet(
                     .fillMaxWidth()
                     .height(56.dp),
                 shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4285F4))
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -120,13 +119,15 @@ fun DifficultySelectionBottomSheet(
                     Text(
                         text = "Start Quiz",
                         fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                         contentDescription = null,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(18.dp),
+                        tint = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             }
@@ -140,8 +141,8 @@ fun DifficultyOptionItem(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val borderColor = if (isSelected) Color(0xFF4285F4) else Color(0xFFF2F3F7)
-    val backgroundColor = if (isSelected) Color(0xFFF8F9FD) else Color.White
+    val borderColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
+    val backgroundColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f) else MaterialTheme.colorScheme.surface
 
     Surface(
         modifier = Modifier
@@ -178,12 +179,12 @@ fun DifficultyOptionItem(
                     text = difficulty.title,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (isSelected) Color(0xFF4285F4) else Color(0xFF1D1D1D)
+                    color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = "${difficulty.subtitle} • ${difficulty.questionsCount} Questions",
                     fontSize = 12.sp,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
@@ -193,7 +194,7 @@ fun DifficultyOptionItem(
                     .size(24.dp)
                     .border(
                         width = 2.dp,
-                        color = if (isSelected) Color(0xFF4285F4) else Color.LightGray,
+                        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
                         shape = CircleShape
                     )
                     .padding(4.dp)
@@ -203,7 +204,7 @@ fun DifficultyOptionItem(
                         modifier = Modifier
                             .fillMaxSize()
                             .clip(CircleShape)
-                            .background(Color(0xFF4285F4))
+                            .background(MaterialTheme.colorScheme.primary)
                     )
                 }
             }

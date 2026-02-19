@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -34,6 +35,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -52,10 +55,12 @@ import androidx.compose.ui.unit.sp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
+    isDarkMode: Boolean,
+    onDarkModeToggle: (Boolean) -> Unit,
     onBackClick: () -> Unit,
     onSignOutClick: () -> Unit
 ) {
-    var isDarkMode by remember { mutableStateOf(false) }
+    var showSignOutDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -71,7 +76,10 @@ fun ProfileScreen(
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                )
             )
         },
         containerColor = MaterialTheme.colorScheme.background
@@ -124,7 +132,7 @@ fun ProfileScreen(
                     .padding(horizontal = 20.dp),
                 shape = RoundedCornerShape(24.dp),
                 color = MaterialTheme.colorScheme.surface,
-                shadowElevation = 2.dp
+                shadowElevation = 1.dp
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     SettingItem(
@@ -139,7 +147,7 @@ fun ProfileScreen(
                         trailingContent = {
                             Switch(
                                 checked = isDarkMode,
-                                onCheckedChange = { isDarkMode = it },
+                                onCheckedChange = onDarkModeToggle,
                                 colors = SwitchDefaults.colors(
                                     checkedThumbColor = MaterialTheme.colorScheme.primary,
                                     checkedTrackColor = MaterialTheme.colorScheme.primaryContainer
@@ -166,7 +174,7 @@ fun ProfileScreen(
                     .padding(horizontal = 20.dp),
                 shape = RoundedCornerShape(24.dp),
                 color = MaterialTheme.colorScheme.surface,
-                shadowElevation = 2.dp
+                shadowElevation = 1.dp
             ) {
                 SettingItem(
                     icon = Icons.Default.Logout,
@@ -174,12 +182,33 @@ fun ProfileScreen(
                     titleColor = MaterialTheme.colorScheme.error,
                     iconColor = MaterialTheme.colorScheme.error,
                     showArrow = false,
-                    onClick = onSignOutClick
+                    onClick = { showSignOutDialog = true }
                 )
             }
             
             Spacer(modifier = Modifier.height(40.dp))
         }
+    }
+
+    if (showSignOutDialog) {
+        AlertDialog(
+            onDismissRequest = { showSignOutDialog = false },
+            title = { Text(text = "Sign Out") },
+            text = { Text(text = "Are you sure you want to sign out?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showSignOutDialog = false
+                    onSignOutClick()
+                }) {
+                    Text(text = "Sign Out", color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showSignOutDialog = false }) {
+                    Text(text = "Cancel")
+                }
+            }
+        )
     }
 }
 
@@ -251,5 +280,5 @@ fun SettingItem(
 @Preview(showBackground = true)
 @Composable
 fun ProfileScreenPreview() {
-    ProfileScreen(onBackClick = {}, onSignOutClick = {})
+    ProfileScreen(isDarkMode = false, onDarkModeToggle = {}, onBackClick = {}, onSignOutClick = {})
 }

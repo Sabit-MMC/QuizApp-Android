@@ -7,5 +7,5 @@ import org.koin.dsl.module
 
 val quizModules = module {
     single { QuizRepository() }
-    viewModel { HomeViewModel(get()) }
+    viewModel { HomeViewModel(get(),get()) }
 }

@@ -2,6 +2,7 @@ package com.example.quizapp.presentation.quiz
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -9,7 +10,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.ui.NavDisplay
@@ -19,6 +19,8 @@ import com.example.quizapp.presentation.profile.ProfileScreen
 import com.example.quizapp.presentation.quiz.model.Category
 import com.example.quizapp.presentation.quiz.screens.AllCategoriesScreen
 import com.example.quizapp.presentation.quiz.screens.HomeScreen
+import com.example.quizapp.presentation.quiz.screens.QuestionScreen
+import com.example.quizapp.presentation.quiz.screens.QuizResultScreen
 import kotlinx.serialization.Serializable
 
 @Composable
@@ -27,10 +29,22 @@ fun HomeNavigation(
     modifier: Modifier = Modifier
 ) {
     val backStack = remember { mutableStateListOf<Any>(HomeKey) }
-    val context = LocalContext.current
     val savedDarkMode by viewModel.isDarkMode.collectAsState()
 
     var selectedCategory by remember { mutableStateOf<Category?>(null) }
+
+    LaunchedEffect(Unit) {
+        viewModel.navigationEvent.collect { event ->
+            when (event) {
+                is HomeNavigationEvent.NavigateToQuestion -> {
+                    selectedCategory = null
+                    backStack.add(QuestionKey)
+                }
+
+                else -> {}
+            }
+        }
+    }
 
     NavDisplay(
         modifier = modifier,
@@ -93,6 +107,27 @@ fun HomeNavigation(
                     )
                 }
 
+                is QuestionKey -> NavEntry(key) {
+                    QuestionScreen(
+                        viewModel = viewModel,
+                        onBackClick = {
+                            backStack.removeLastOrNull()
+                        },
+                        onQuizFinish = {
+                            backStack.add(QuestionResultKey)
+                        }
+                    )
+                }
+
+                is QuestionResultKey -> NavEntry(key) {
+                    QuizResultScreen(
+                        viewModel = viewModel,
+                        onBackClick = {
+                            backStack.removeLastOrNull()
+                        }
+                    )
+                }
+
                 else -> NavEntry(Unit) { /* Handle unknown keys */ }
             }
         }
@@ -102,9 +137,10 @@ fun HomeNavigation(
         DifficultySelectionBottomSheet(
             category = category,
             onDismissRequest = { selectedCategory = null },
-            onStartQuiz = { _ ->
-                selectedCategory = null
-            }
+            onStartQuiz = { difficulty ->
+                viewModel.startQuiz(category.id, difficulty.title.uppercase())
+            },
+            isLoading = viewModel.isQuestionsLoading
         )
     }
 }
@@ -120,3 +156,9 @@ data object NotificationsKey : NavKey
 
 @Serializable
 data object ProfileKey : NavKey
+
+@Serializable
+data object QuestionKey : NavKey
+
+@Serializable
+data object QuestionResultKey : NavKey

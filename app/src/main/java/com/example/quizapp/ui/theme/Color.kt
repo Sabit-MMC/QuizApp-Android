@@ -59,3 +59,10 @@ val OnSurfaceDark = Color(0xFFE2E2E9)
 val SurfaceVariantDark = Color(0xFF44474E)
 val OnSurfaceVariantDark = Color(0xFFC4C6D0)
 val OutlineDark = Color(0xFF8E9099)
+
+// Quiz Specific Colors
+val CorrectAnswer = Color(0xFF4CAF50)
+val IncorrectAnswer = Color(0xFFF44336)
+val CorrectAnswerContainer = Color(0xFFE8F5E9)
+val IncorrectAnswerContainer = Color(0xFFFFEBEE)
+val NextQuestionButton = Color(0xFF101828)

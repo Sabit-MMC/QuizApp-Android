@@ -8,9 +8,9 @@ sealed class Difficulty(
     val questionsCount: Int,
     val color: Color
 ) {
-    data object Simple : Difficulty("Simple", "Beginner friendly", 5, Color(0xFF4CAF50))
-    data object Medium : Difficulty("Medium", "Standard challenge", 10, Color(0xFFFF9800))
-    data object Advanced : Difficulty("Advanced", "For experts only", 20, Color(0xFFF44336))
+    data object Simple : Difficulty("SIMPLE", "Beginner friendly", 5, Color(0xFF4CAF50))
+    data object Medium : Difficulty("MEDIUM", "Standard challenge", 10, Color(0xFFFF9800))
+    data object Advanced : Difficulty("ADVANCED", "For experts only", 20, Color(0xFFF44336))
 
     companion object {
         val all: List<Difficulty> get() = listOf(Simple, Medium, Advanced)

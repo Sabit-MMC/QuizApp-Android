@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -34,6 +35,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,6 +61,7 @@ fun HomeScreen(
     onProfileClick: () -> Unit
 ) {
     val uiState = viewModel.uiState
+    var searchQuery by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -122,8 +128,8 @@ fun HomeScreen(
 
         // Search Bar
         OutlinedTextField(
-            value = "",
-            onValueChange = {},
+            value = searchQuery,
+            onValueChange = { searchQuery = it },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 16.dp),
@@ -175,8 +181,15 @@ fun HomeScreen(
             }
 
             is HomeUiState.Success -> {
+                val filteredCategories = remember(searchQuery, uiState.categories) {
+                    if (searchQuery.isEmpty()) {
+                        uiState.categories
+                    } else {
+                        uiState.categories.filter { it.name.az.contains(searchQuery, ignoreCase = true) }
+                    }
+                }
                 CategoryGrid(
-                    categories = uiState.categories.take(4), // Show only first 4 on home
+                    categories = filteredCategories.take(4), // Show only first 4 on home
                     onCategoryClick = onCategoryClick
                 )
             }
@@ -245,7 +258,7 @@ fun CategoryItem(
 
             Column {
                 Text(
-                    text = category.name.en,
+                    text = category.name.az,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,

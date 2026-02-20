@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.RemoveCircle
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,20 +23,33 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.quizapp.presentation.quiz.HistoryUiState
 import com.example.quizapp.presentation.quiz.HomeViewModel
+import com.example.quizapp.presentation.quiz.model.QuizHistoryItem
 import com.example.quizapp.ui.theme.CorrectAnswer
 import com.example.quizapp.ui.theme.IncorrectAnswer
 
 @Composable
 fun QuizResultScreen(
     viewModel: HomeViewModel,
-    onBackClick: () -> Unit
+    categoryName: String,
+    onBackClick: () -> Unit,
+    onViewAllClick: () -> Unit
 ) {
     val correct = viewModel.correctAnswers
     val wrong = viewModel.wrongAnswers
     val skipped = viewModel.skippedAnswers
     val total = viewModel.questions.size
     val scorePercent = if (total > 0) (correct * 100) / total else 0
+    val historyState = viewModel.historyState
+
+    // Fetch history when screen opens
+    LaunchedEffect(Unit) {
+        val categoryId = viewModel.questions.firstOrNull()?.categoryId
+        if (categoryId != null) {
+            viewModel.getQuizHistory(categoryId)
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -53,14 +67,14 @@ fun QuizResultScreen(
                     )
                 }
                 Text(
-                    text = "Science Quiz Results", // Dynamic title?
+                    text = "$categoryName Quiz Results",
                     modifier = Modifier.weight(1f),
                     textAlign = TextAlign.Center,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                Spacer(modifier = Modifier.width(48.dp)) // Spacer for center alignment
+                Spacer(modifier = Modifier.width(48.dp))
             }
         },
         containerColor = MaterialTheme.colorScheme.background
@@ -167,17 +181,40 @@ fun QuizResultScreen(
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                TextButton(onClick = { /* View All */ }) {
+                TextButton(onClick = onViewAllClick) {
                     Text("View All", color = MaterialTheme.colorScheme.primary)
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Mock Stats Items
-            repeat(3) {
-                PreviousStatItem()
-                Spacer(modifier = Modifier.height(12.dp))
+            // Real History Data
+            when (historyState) {
+                is HistoryUiState.Loading -> {
+                    CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                }
+                is HistoryUiState.Success -> {
+                    if (historyState.history.isEmpty()) {
+                        Text(
+                            text = "No previous attempts found.",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    } else {
+                        historyState.history.take(5).forEach { historyItem ->
+                            PreviousStatItem(historyItem)
+                            Spacer(modifier = Modifier.height(12.dp))
+                        }
+                    }
+                }
+                is HistoryUiState.Error -> {
+                    Text(
+                        text = "Failed to load history: ${historyState.message}",
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+                else -> {}
             }
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -226,7 +263,9 @@ fun ResultStatCard(
 }
 
 @Composable
-fun PreviousStatItem() {
+fun PreviousStatItem(historyItem: QuizHistoryItem) {
+    val scorePercent = (historyItem.score * 100) / historyItem.totalQuestions
+    
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -253,8 +292,9 @@ fun PreviousStatItem() {
             }
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
+                // Simple date formatting if needed, for now using string from API
                 Text(
-                    text = "Oct 24, 2023",
+                    text = historyItem.createdAt.split("T").firstOrNull() ?: "",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
@@ -264,7 +304,7 @@ fun PreviousStatItem() {
                     shape = RoundedCornerShape(4.dp)
                 ) {
                     Text(
-                        text = "MEDIUM",
+                        text = historyItem.level,
                         modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold,
@@ -274,7 +314,7 @@ fun PreviousStatItem() {
             }
             Column(horizontalAlignment = Alignment.End) {
                 Text(
-                    text = "80%",
+                    text = "$scorePercent%",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface

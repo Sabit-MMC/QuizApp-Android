@@ -4,7 +4,18 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -43,7 +54,7 @@ fun QuestionScreen(
     var currentQuestionIndex by remember { mutableIntStateOf(0) }
     var selectedOptionId by remember { mutableStateOf<String?>(null) }
     var isAnswered by remember { mutableStateOf(false) }
-    var timeLeft by remember { mutableIntStateOf(20) }
+    var timeLeft by remember { mutableIntStateOf(3) }
 
     val currentQuestion = questions.getOrNull(currentQuestionIndex) ?: return
 
@@ -53,6 +64,7 @@ fun QuestionScreen(
             selectedOptionId = null
             isAnswered = false
         } else {
+            viewModel.submitQuiz(currentQuestion.categoryId, currentQuestion.level)
             onQuizFinish()
         }
     }
@@ -136,8 +148,6 @@ fun QuestionScreen(
                 .padding(horizontal = 24.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
-
             // Progress Section
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -154,7 +164,7 @@ fun QuestionScreen(
                     Spacer(modifier = Modifier.height(8.dp))
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth() // Increased width by using fillMaxWidth on the container Column weight
+                            .fillMaxWidth() 
                             .height(8.dp)
                             .clip(RoundedCornerShape(4.dp))
                             .background(MaterialTheme.colorScheme.surfaceVariant)
@@ -187,7 +197,7 @@ fun QuestionScreen(
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
                         )
-                        Spacer(modifier = Modifier.height(2.dp)) // Added padding between timer texts
+                        Spacer(modifier = Modifier.height(2.dp))
                         Text(
                             text = "sec",
                             fontSize = 8.sp,
@@ -201,23 +211,13 @@ fun QuestionScreen(
 
             // Question Text
             Text(
-                text = currentQuestion.text.en,
-                fontSize = 24.sp,
+                text = currentQuestion.text.az,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth(),
-                lineHeight = 32.sp,
+                lineHeight = 24.sp,
                 color = MaterialTheme.colorScheme.onSurface
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "Select the correct city from the list below",
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(40.dp))
@@ -228,7 +228,7 @@ fun QuestionScreen(
                     val letter = ('A' + index).toString()
                     OptionItem(
                         letter = letter,
-                        text = option.text.en,
+                        text = option.text.az,
                         isSelected = selectedOptionId == option.id,
                         isCorrect = option.isCorrect,
                         isAnswered = isAnswered,

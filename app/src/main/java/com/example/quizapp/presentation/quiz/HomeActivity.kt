@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -22,10 +23,12 @@ class HomeActivity : ComponentActivity() {
             val savedDarkMode by homeViewModel.isDarkMode.collectAsState()
             val isLoggedIn by homeViewModel.isLoggedIn.collectAsState(initial = true)
 
-            if (!isLoggedIn) {
-                val intent = Intent(this, AuthActivity::class.java)
-                startActivity(intent)
-                finish()
+            LaunchedEffect(isLoggedIn) {
+                if (!isLoggedIn) {
+                    val intent = Intent(this@HomeActivity, AuthActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                }
             }
 
             QuizAppTheme(
@@ -41,4 +44,3 @@ class HomeActivity : ComponentActivity() {
         }
     }
 }
-

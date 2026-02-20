@@ -36,6 +36,7 @@ class AuthViewModel(
             val requestBody = AuthRequestBody(userId = email, password = pass)
             when (val result = authRepository.signIn(requestBody)) {
                 is NetworkResult.Success -> {
+                    dataStoreConfig.setUserId(result.data.userId)
                     dataStoreConfig.setLoggedIn(true)
                     uiState = AuthUiState.Success
                     _navigationEvent.emit(AuthNavigationEvent.NavigateToHome)

@@ -5,14 +5,15 @@ import androidx.compose.ui.graphics.Color
 sealed class Difficulty(
     val title: String,
     val subtitle: String,
-    val questionsCount: Int,
-    val color: Color
+    val color: Color,
+    val keyword: String,
+    val questionsCount: Int? = null
 ) {
-    data object Simple : Difficulty("SIMPLE", "Beginner friendly", 5, Color(0xFF4CAF50))
-    data object Medium : Difficulty("MEDIUM", "Standard challenge", 10, Color(0xFFFF9800))
-    data object Advanced : Difficulty("ADVANCED", "For experts only", 20, Color(0xFFF44336))
+    data object Simple : Difficulty(title = "Simple", subtitle = "Beginner friendly", Color(0xFF4CAF50), keyword = "SIMPLE")
+    data object Medium : Difficulty(title = "Medium", subtitle = "Standard challenge", Color(0xFFFF9800), keyword = "MEDIUM")
+    data object Advance : Difficulty(title = "Advance", subtitle = "For experts only", Color(0xFFF44336), keyword = "ADVANCE")
 
     companion object {
-        val all: List<Difficulty> get() = listOf(Simple, Medium, Advanced)
+        val all: List<Difficulty> get() = listOf(Simple, Medium, Advance)
     }
 }

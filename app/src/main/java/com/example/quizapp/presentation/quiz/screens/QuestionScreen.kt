@@ -25,23 +25,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -61,6 +46,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun QuestionScreen(
     viewModel: HomeViewModel,
+    categoryName: String,
     onBackClick: () -> Unit,
     onQuizFinish: () -> Unit
 ) {
@@ -68,9 +54,20 @@ fun QuestionScreen(
     var currentQuestionIndex by remember { mutableIntStateOf(0) }
     var selectedOptionId by remember { mutableStateOf<String?>(null) }
     var isAnswered by remember { mutableStateOf(false) }
-    var timeLeft by remember { mutableIntStateOf(20) }
+    var timeLeft by remember { mutableIntStateOf(3) }
 
     val currentQuestion = questions.getOrNull(currentQuestionIndex) ?: return
+
+    fun onNextClick() {
+        if (currentQuestionIndex < questions.size - 1) {
+            currentQuestionIndex++
+            selectedOptionId = null
+            isAnswered = false
+        } else {
+            viewModel.submitQuiz(currentQuestion.categoryId, currentQuestion.level)
+            onQuizFinish()
+        }
+    }
 
     // Timer Logic
     LaunchedEffect(currentQuestionIndex, isAnswered) {
@@ -113,14 +110,14 @@ fun QuestionScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Check,
+                            imageVector = Icons.Default.Check, 
                             contentDescription = null,
                             modifier = Modifier.size(16.dp),
                             tint = MaterialTheme.colorScheme.primary
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Geography", // Should be dynamic if possible
+                            text = categoryName,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -128,13 +125,17 @@ fun QuestionScreen(
                     }
                 }
 
-                TextButton(onClick = { 
-                    if (!isAnswered) {
-                        isAnswered = true
-                        viewModel.recordAnswer(null)
+                if (currentQuestionIndex < questions.size - 1) {
+                    TextButton(onClick = {
+                        if (!isAnswered) {
+                            viewModel.recordAnswer(null)
+                            onNextClick()
+                        }
+                    }) {
+                        Text("Skip", color = MaterialTheme.colorScheme.outline)
                     }
-                }) {
-                    Text("Skip", color = MaterialTheme.colorScheme.outline)
+                } else {
+                    Spacer(modifier = Modifier.width(48.dp))
                 }
             }
         },
@@ -147,8 +148,6 @@ fun QuestionScreen(
                 .padding(horizontal = 24.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
-
             // Progress Section
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -165,7 +164,7 @@ fun QuestionScreen(
                     Spacer(modifier = Modifier.height(8.dp))
                     Box(
                         modifier = Modifier
-                            .width(200.dp)
+                            .fillMaxWidth() 
                             .height(8.dp)
                             .clip(RoundedCornerShape(4.dp))
                             .background(MaterialTheme.colorScheme.surfaceVariant)
@@ -180,6 +179,8 @@ fun QuestionScreen(
                     }
                 }
 
+                Spacer(modifier = Modifier.width(24.dp))
+
                 // Timer
                 Box(contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(
@@ -189,13 +190,14 @@ fun QuestionScreen(
                         color = MaterialTheme.colorScheme.primary,
                         trackColor = MaterialTheme.colorScheme.surfaceVariant,
                     )
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                         Text(
                             text = timeLeft.toString(),
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
                         )
+                        Spacer(modifier = Modifier.height(2.dp))
                         Text(
                             text = "sec",
                             fontSize = 8.sp,
@@ -209,23 +211,13 @@ fun QuestionScreen(
 
             // Question Text
             Text(
-                text = currentQuestion.text.en,
-                fontSize = 24.sp,
+                text = currentQuestion.text.az,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth(),
-                lineHeight = 32.sp,
+                lineHeight = 24.sp,
                 color = MaterialTheme.colorScheme.onSurface
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "Select the correct city from the list below",
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(40.dp))
@@ -236,7 +228,7 @@ fun QuestionScreen(
                     val letter = ('A' + index).toString()
                     OptionItem(
                         letter = letter,
-                        text = option.text.en,
+                        text = option.text.az,
                         isSelected = selectedOptionId == option.id,
                         isCorrect = option.isCorrect,
                         isAnswered = isAnswered,
@@ -286,15 +278,7 @@ fun QuestionScreen(
                 }
 
                 Button(
-                    onClick = {
-                        if (currentQuestionIndex < questions.size - 1) {
-                            currentQuestionIndex++
-                            selectedOptionId = null
-                            isAnswered = false
-                        } else {
-                            onQuizFinish()
-                        }
-                    },
+                    onClick = { onNextClick() },
                     modifier = Modifier
                         .width(200.dp)
                         .height(56.dp),

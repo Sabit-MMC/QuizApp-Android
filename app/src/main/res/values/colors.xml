@@ -7,4 +7,8 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Design colors for Splash/WindowBackground -->
+    <color name="background_light">#F2F3F7</color>
+    <color name="background_dark">#111318</color>
 </resources>

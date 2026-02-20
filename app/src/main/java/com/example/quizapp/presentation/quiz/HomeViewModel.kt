@@ -10,12 +10,15 @@ import com.example.quizapp.data.network.NetworkResult
 import com.example.quizapp.data.tools.DataStoreConfig
 import com.example.quizapp.presentation.quiz.model.Category
 import com.example.quizapp.presentation.quiz.model.Question
+import com.example.quizapp.presentation.quiz.model.QuizHistoryItem
+import com.example.quizapp.presentation.quiz.model.QuizSubmission
 import com.example.quizapp.presentation.quiz.repository.QuizRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -37,6 +40,9 @@ class HomeViewModel(
     var correctAnswers by mutableIntStateOf(0)
     var wrongAnswers by mutableIntStateOf(0)
     var skippedAnswers by mutableIntStateOf(0)
+
+    var historyState by mutableStateOf<HistoryUiState>(HistoryUiState.Idle)
+        private set
 
     private val _navigationEvent = MutableSharedFlow<HomeNavigationEvent>()
     val navigationEvent = _navigationEvent.asSharedFlow()
@@ -95,6 +101,36 @@ class HomeViewModel(
         }
     }
 
+    fun submitQuiz(categoryId: String, level: String) {
+        viewModelScope.launch {
+            val userId = dataStoreConfig.userId.first() ?: return@launch
+            val submission = QuizSubmission(
+                userId = userId,
+                categoryId = categoryId,
+                level = level,
+                score = correctAnswers,
+                totalQuestions = questions.size
+            )
+            quizRepository.submitQuiz(submission)
+        }
+    }
+
+    fun getQuizHistory(categoryId: String) {
+        viewModelScope.launch {
+            historyState = HistoryUiState.Loading
+            val userId = dataStoreConfig.userId.first() ?: return@launch
+            when (val result = quizRepository.getQuizHistory(userId, categoryId)) {
+                is NetworkResult.Success -> {
+                    historyState = HistoryUiState.Success(result.data)
+                }
+                is NetworkResult.Error -> {
+                    historyState = HistoryUiState.Error(result.message)
+                }
+                else -> {}
+            }
+        }
+    }
+
     fun toggleDarkMode(darkMode: Boolean) {
         viewModelScope.launch {
             dataStoreConfig.setDarkMode(darkMode)
@@ -104,6 +140,7 @@ class HomeViewModel(
     fun signOut() {
         viewModelScope.launch {
             dataStoreConfig.setLoggedIn(false)
+            dataStoreConfig.setUserId(null)
         }
     }
 }
@@ -112,6 +149,13 @@ sealed interface HomeUiState {
     data object Loading : HomeUiState
     data class Success(val categories: List<Category>) : HomeUiState
     data class Error(val message: String) : HomeUiState
+}
+
+sealed interface HistoryUiState {
+    data object Idle : HistoryUiState
+    data object Loading : HistoryUiState
+    data class Success(val history: List<QuizHistoryItem>) : HistoryUiState
+    data class Error(val message: String) : HistoryUiState
 }
 
 sealed interface HomeNavigationEvent {

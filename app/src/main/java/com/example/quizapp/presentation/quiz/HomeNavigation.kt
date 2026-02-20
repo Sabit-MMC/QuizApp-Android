@@ -32,11 +32,13 @@ fun HomeNavigation(
     val savedDarkMode by viewModel.isDarkMode.collectAsState()
 
     var selectedCategory by remember { mutableStateOf<Category?>(null) }
+    var quizCategoryName by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         viewModel.navigationEvent.collect { event ->
             when (event) {
                 is HomeNavigationEvent.NavigateToQuestion -> {
+                    quizCategoryName = selectedCategory?.name?.az ?: ""
                     selectedCategory = null
                     backStack.add(QuestionKey)
                 }
@@ -113,6 +115,7 @@ fun HomeNavigation(
                         onBackClick = {
                             backStack.removeLastOrNull()
                         },
+                        categoryName = quizCategoryName,
                         onQuizFinish = {
                             backStack.add(QuestionResultKey)
                         }

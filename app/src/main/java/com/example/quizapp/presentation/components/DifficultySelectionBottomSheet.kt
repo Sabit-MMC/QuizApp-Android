@@ -113,7 +113,10 @@ fun DifficultySelectionBottomSheet(
                     .height(56.dp),
                 shape = RoundedCornerShape(16.dp),
                 enabled = !isLoading,
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    disabledContainerColor = MaterialTheme.colorScheme.primary // Keep same color when loading
+                )
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(

@@ -100,7 +100,7 @@ fun DifficultySelectionBottomSheet(
 
             // Category Name
             Text(
-                text = "${category?.name?.az} Trivia",
+                text = "${category?.name?.az}",
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface

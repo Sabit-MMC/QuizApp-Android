@@ -34,7 +34,8 @@ fun QuizResultScreen(
     viewModel: HomeViewModel,
     categoryName: String,
     onBackClick: () -> Unit,
-    onViewAllClick: () -> Unit
+    onViewAllClick: () -> Unit,
+    onReviewClick: () -> Unit
 ) {
     val correct = viewModel.correctAnswers
     val wrong = viewModel.wrongAnswers
@@ -147,7 +148,7 @@ fun QuizResultScreen(
 
             // Review Button
             Button(
-                onClick = { /* Review answers */ },
+                onClick = onReviewClick,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),

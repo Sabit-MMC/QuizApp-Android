@@ -19,6 +19,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Logout
@@ -69,16 +70,22 @@ fun ProfileScreen(
                     Text(
                         "Profile",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
+                        fontSize = 20.sp,
+                        color = MaterialTheme.colorScheme.onSurface
                     ) 
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack, 
+                            contentDescription = "Back",
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
+                    containerColor = Color.Transparent,
+                    scrolledContainerColor = MaterialTheme.colorScheme.surface
                 )
             )
         },
@@ -177,7 +184,7 @@ fun ProfileScreen(
                 shadowElevation = 1.dp
             ) {
                 SettingItem(
-                    icon = Icons.Default.Logout,
+                    icon = Icons.AutoMirrored.Filled.Logout,
                     title = "Sign Out",
                     titleColor = MaterialTheme.colorScheme.error,
                     iconColor = MaterialTheme.colorScheme.error,

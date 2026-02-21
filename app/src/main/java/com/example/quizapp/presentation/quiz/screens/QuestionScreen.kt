@@ -79,7 +79,7 @@ fun QuestionScreen(
             }
             if (timeLeft == 0 && !isAnswered) {
                 isAnswered = true
-                viewModel.recordAnswer(null) // Mark as skipped
+                viewModel.recordAnswer(currentQuestion.id, null, null) // Mark as skipped
             }
         }
     }
@@ -128,7 +128,7 @@ fun QuestionScreen(
                 if (currentQuestionIndex < questions.size - 1) {
                     TextButton(onClick = {
                         if (!isAnswered) {
-                            viewModel.recordAnswer(null)
+                            viewModel.recordAnswer(currentQuestion.id, null, null)
                             onNextClick()
                         }
                     }) {
@@ -236,7 +236,7 @@ fun QuestionScreen(
                             if (!isAnswered) {
                                 selectedOptionId = option.id
                                 isAnswered = true
-                                viewModel.recordAnswer(option.isCorrect)
+                                viewModel.recordAnswer(currentQuestion.id, option.id, option.isCorrect)
                             }
                         }
                     )

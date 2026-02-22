@@ -40,6 +40,10 @@ class HomeViewModel(
     var correctAnswers by mutableIntStateOf(0)
     var wrongAnswers by mutableIntStateOf(0)
     var skippedAnswers by mutableIntStateOf(0)
+    
+    // Store user answers: QuestionID -> OptionID
+    var userAnswers by mutableStateOf<Map<String, String?>>(emptyMap())
+        private set
 
     var historyState by mutableStateOf<HistoryUiState>(HistoryUiState.Idle)
         private set
@@ -78,6 +82,7 @@ class HomeViewModel(
             correctAnswers = 0
             wrongAnswers = 0
             skippedAnswers = 0
+            userAnswers = emptyMap()
             
             when (val result = quizRepository.getQuestions(categoryId, level)) {
                 is NetworkResult.Success -> {
@@ -93,7 +98,8 @@ class HomeViewModel(
         }
     }
 
-    fun recordAnswer(isCorrect: Boolean?) {
+    fun recordAnswer(questionId: String, optionId: String?, isCorrect: Boolean?) {
+        userAnswers = userAnswers + (questionId to optionId)
         when (isCorrect) {
             true -> correctAnswers++
             false -> wrongAnswers++

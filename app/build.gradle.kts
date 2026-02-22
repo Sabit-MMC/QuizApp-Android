@@ -111,6 +111,8 @@ dependencies {
 
     implementation(libs.kotlin.serialization)
     implementation(libs.coil.compose)
+    implementation(libs.coil.svg)
+    implementation(libs.coil.network.okhttp)
 
     //koin
     implementation(libs.koin.core)

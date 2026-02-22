@@ -23,6 +23,7 @@ import com.example.quizapp.presentation.quiz.screens.AllQuizResultScreen
 import com.example.quizapp.presentation.quiz.screens.HomeScreen
 import com.example.quizapp.presentation.quiz.screens.QuestionScreen
 import com.example.quizapp.presentation.quiz.screens.QuizResultScreen
+import com.example.quizapp.presentation.quiz.screens.ReviewQuestionsScreen
 import kotlinx.serialization.Serializable
 
 @Composable
@@ -144,6 +145,9 @@ fun HomeNavigation(
                         },
                         onViewAllClick = {
                             backStack.add(AllQuizResultKey)
+                        },
+                        onReviewClick = {
+                            backStack.add(ReviewQuestionsKey)
                         }
                     )
                 }
@@ -153,6 +157,15 @@ fun HomeNavigation(
                         viewModel = viewModel,
                         categoryId = quizCategoryId,
                         categoryName = quizCategoryName,
+                        onBackClick = {
+                            backStack.removeLastOrNull()
+                        }
+                    )
+                }
+
+                is ReviewQuestionsKey -> NavEntry(key) {
+                    ReviewQuestionsScreen(
+                        viewModel = viewModel,
                         onBackClick = {
                             backStack.removeLastOrNull()
                         }
@@ -196,3 +209,6 @@ data object QuestionResultKey : NavKey
 
 @Serializable
 data object AllQuizResultKey : NavKey
+
+@Serializable
+data object ReviewQuestionsKey : NavKey

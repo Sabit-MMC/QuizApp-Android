@@ -1,6 +1,8 @@
 package com.example.quizapp.presentation.quiz.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,7 +10,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -45,6 +46,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
@@ -185,7 +187,12 @@ fun HomeScreen(
                     if (searchQuery.isEmpty()) {
                         uiState.categories
                     } else {
-                        uiState.categories.filter { it.name.az.contains(searchQuery, ignoreCase = true) }
+                        uiState.categories.filter {
+                            it.name.az.contains(
+                                searchQuery,
+                                ignoreCase = true
+                            )
+                        }
                     }
                 }
                 CategoryGrid(
@@ -226,46 +233,44 @@ fun CategoryItem(
     category: Category,
     onClick: () -> Unit
 ) {
-    Surface(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .aspectRatio(0.9f)
             .clip(RoundedCornerShape(24.dp))
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(24.dp),
-        color = MaterialTheme.colorScheme.surface,
-        shadowElevation = 2.dp
+            .border(
+                BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)),
+                RoundedCornerShape(24.dp)
+            )
+            .clickable(onClick = onClick)
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
-            modifier = Modifier
-                .padding(20.dp),
-            verticalArrangement = Arrangement.SpaceBetween
+        Surface(
+            modifier = Modifier.size(100.dp),
+            shape = RoundedCornerShape(20.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
         ) {
-            Box(
+            AsyncImage(
+                model = category.iconUrl,
+                contentDescription = null,
                 modifier = Modifier
-                    .size(44.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                contentAlignment = Alignment.Center
-            ) {
-                AsyncImage(
-                    model = category.iconUrl,
-                    contentDescription = null,
-                    modifier = Modifier.size(26.dp),
-                    contentScale = ContentScale.Fit
-                )
-            }
-
-            Column {
-                Text(
-                    text = category.name.az,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    lineHeight = 20.sp,
-                    maxLines = 2
-                )
-            }
+                    .fillMaxSize()
+                    .padding(12.dp),
+                contentScale = ContentScale.Fit
+            )
         }
+        
+        Spacer(modifier = Modifier.height(12.dp))
+        
+        Text(
+            text = category.name.az,
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp
+            ),
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Center,
+            maxLines = 1
+        )
     }
 }

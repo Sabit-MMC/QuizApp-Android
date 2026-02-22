@@ -54,7 +54,6 @@ fun DifficultySelectionBottomSheet(
     onStartQuiz: (Difficulty) -> Unit = {}
 ) {
 
-    //Salam
     var selectedDifficulty by remember { mutableStateOf<Difficulty>(Difficulty.Simple) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
